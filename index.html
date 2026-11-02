@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>中山國中 肌力與體能</title>
+<meta name="theme-color" content="#18243A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="肌力課">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>
+:root{
+  --navy:#18243A; --orange:#E2873B; --cream:#F3EEE4; --ink:#1d2433; --muted:#6b7280;
+  --line:#e2dccf; --card:#fffdf8; --ok:#2f8f5b; --warn:#c0392b; --gray:#9aa1ad;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"PingFang TC","Noto Sans TC",sans-serif;background:var(--cream);color:var(--ink);font-size:14px}
+header{background:var(--navy);color:var(--cream);padding:14px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+header h1{font-size:18px;margin:0;font-weight:600}
+header .sub{font-size:12px;opacity:.75}
+header .cd{margin-left:auto;text-align:right}
+header .cd b{color:var(--orange);font-size:22px}
+nav{display:flex;gap:4px;padding:0 16px;background:var(--navy);border-bottom:3px solid var(--orange);overflow-x:auto}
+nav button{background:none;border:0;color:#c9cfdb;padding:10px 14px;font-size:14px;cursor:pointer;white-space:nowrap;font-family:inherit}
+nav button.on{color:#fff;border-bottom:3px solid var(--orange);margin-bottom:-3px;font-weight:600}
+main{padding:18px;max-width:1200px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:14px}
+.card h2{font-size:16px;margin:0 0 10px;color:var(--navy)}
+.card h3{font-size:14px;margin:14px 0 6px;color:var(--navy)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+input,select,textarea{font-family:inherit;font-size:14px;padding:6px 8px;border:1px solid #cfc8b8;border-radius:6px;background:#fff;color:var(--ink)}
+textarea{width:100%;min-height:70px;resize:vertical;line-height:1.5}
+label.f{display:block;font-size:12px;color:var(--muted);margin:8px 0 3px}
+button.b{background:var(--navy);color:#fff;border:0;border-radius:6px;padding:7px 14px;cursor:pointer;font-family:inherit;font-size:13px}
+button.b.o{background:var(--orange)}
+button.b.g{background:#fff;color:var(--navy);border:1px solid var(--navy)}
+button.b.r{background:#fff;color:var(--warn);border:1px solid var(--warn)}
+button.b:disabled{opacity:.4;cursor:default}
+table{border-collapse:collapse;width:100%}
+th,td{border-bottom:1px solid var(--line);padding:7px 6px;text-align:left;vertical-align:top}
+th{font-size:12px;color:var(--muted);font-weight:500;background:#faf6ee}
+tr.click{cursor:pointer}
+tr.click:hover td{background:#fbf3e6}
+tr.past td{color:#555}
+tr.next td{background:#fff3e3}
+.pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;color:#fff;white-space:nowrap}
+.st-planned{background:var(--gray)} .st-done{background:var(--ok)} .st-cancelled{background:var(--warn)} .st-tbc{background:#b58b00}
+.tag{display:inline-block;padding:1px 6px;border-radius:4px;font-size:11px;background:var(--orange);color:#fff;margin-left:4px}
+.phasebar{display:flex;height:34px;border-radius:6px;overflow:hidden;margin:6px 0 4px}
+.phasebar div{display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;overflow:hidden;white-space:nowrap;padding:0 4px}
+.muted{color:var(--muted);font-size:12px}
+.stat{flex:1;min-width:130px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px}
+.stat b{display:block;font-size:22px;color:var(--navy)}
+.att td input[type=number]{width:72px}
+.blk{border-left:4px solid var(--orange);padding-left:10px;margin:10px 0}
+.blk .t{font-weight:600;color:var(--navy);font-size:13px}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:8px 16px;border-radius:8px;opacity:0;transition:.3s;pointer-events:none}
+.toast.show{opacity:1}
+.up{color:var(--ok);font-weight:600} .down{color:var(--warn);font-weight:600}
+.hide{display:none}
+.chart{width:100%;height:180px}
+.wu li{margin:6px 0;line-height:1.5}
+.guide{background:#fbf3e6;border-radius:8px;padding:8px 12px;margin-bottom:8px;font-size:13px}
+.guide ul{margin:6px 0;padding-left:20px} .guide li{margin:3px 0;line-height:1.5}
+.ex{display:flex;gap:6px;margin:6px 0}
+.ex input{min-width:0}.exn{flex:3}.exs{width:56px}.exr{width:68px}.exo{flex:2}
+.ex .b{padding:4px 10px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr!important}}
+@media(max-width:600px){
+  body{font-size:15px}
+  input,select,textarea{font-size:16px}
+  header{padding:12px 14px} main{padding:12px}
+  .card{padding:12px}
+  .ex{flex-wrap:wrap}
+  .exn{flex:1 1 100%}
+  .exs,.exr{flex:1 1 20%;width:auto}
+  .exo{flex:2 1 30%}
+  nav button{padding:12px 14px}
+}
+.guide summary,details.card>summary{cursor:pointer;font-weight:600;color:var(--navy)}
+details.card>summary{font-size:15px}
+details.card[open]>summary{margin-bottom:10px}
+details.card .card{border:0;padding:0;background:none;margin:0 0 8px}
+@media print{header,nav,.noprint,#tab-more>details:not(#dWarm){display:none!important} body{background:#fff} main{padding:0} .card{border:0}}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>中山國中 肌力與體能訓練</h1>
+    <div class="sub" id="hdrSub"></div>
+    <div class="sub" id="syncSt" style="margin-top:2px"></div>
+  </div>
+  <div class="cd" id="hdrCd"></div>
+</header>
+<nav id="nav">
+  <button data-tab="session" class="on">本堂課</button>
+  <button data-tab="overview">時程</button>
+  <button data-tab="more">更多</button>
+</nav>
+<main>
+  <section id="tab-session"></section>
+  <section id="tab-overview" class="hide"></section>
+  <section id="tab-more" class="hide">
+    <details class="card" id="dWarm"><summary>專項教練熱身（給羽球教練）</summary><div id="tab-warmup"></div></details>
+    <details class="card"><summary>訓練負荷</summary><div id="tab-load"></div></details>
+    <details class="card"><summary>訓練依據（文獻）</summary><div id="tab-refs"></div></details>
+    <details class="card"><summary>設定與備份</summary><div id="tab-settings"></div></details>
+  </section>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+const KEY='zsjh_sc_v1';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Math.random().toString(36).slice(2,9);
+
+const BLOCKS=[
+  {k:'warmup',t:'動作準備（10–15分）'},
+  {k:'speed',t:'爆發／跳躍／步法速度（約15分）'},
+  {k:'strength',t:'主肌力（約35–40分）'},
+  {k:'accessory',t:'傷害預防／神經肌肉（約10分）'},
+  {k:'cooldown',t:'收操與回饋（約10分）'}
+];
+
+const DEFAULT_PHASES=[
+  {id:'p1',name:'評估與適應',start:'2026-11-03',end:'2026-11-24',color:'#5b7aa6',goal:'建立上課流程與分站秩序；以技術學習為主，低量、低到中強度；先教落地再教跳。'},
+  {id:'p2',name:'基礎肌力',start:'2026-12-01',end:'2027-01-19',color:'#18243A',goal:'技術穩定後才漸進加量加負荷（2–4 組×6–12 下、≤80%1RM）；低強度跳躍。'},
+  {id:'p3',name:'寒假',start:'2027-01-26',end:'2027-02-09',color:'#9aa1ad',goal:'學校寒假與春節（待確認校方行事曆）；停課約 3 週，給居家維持內容，避免完全中斷。'},
+  {id:'p4',name:'肌力轉爆發',start:'2027-02-16',end:'2027-03-16',color:'#b5652a',goal:'在肌力基礎上加入爆發：肌力＋跳躍複合訓練；爆發動作排在疲勞前、組間休息較長。'},
+  {id:'p5',name:'賽前速度爆發',start:'2027-03-23',end:'2027-04-06',color:'#E2873B',goal:'維持強度、降低總量；提高專項連結（做休比約 1:2）。'},
+  {id:'p6',name:'減量',start:'2027-04-13',end:'2027-04-13',color:'#2f8f5b',goal:'全中運前最後一堂：總量明顯減少、強度維持、不加新動作。'}
+];
+
+const COMMON_RULES=[
+  '每堂結構：動作準備 → 爆發／跳躍（疲勞前）→ 主肌力 → 傷害預防 → 收操（AAP 2020：動態熱身開始、低強度伸展收操）',
+  '技術優先：疲勞導致動作走樣就停止該組；要隨時觀察並給回饋（2014 國際共識）',
+  '回饋量取決於人數 → 20–25 人分 3–4 站、每站 5–6 人，每站有人看動作（2014 國際共識：合格指導）',
+  '組間休息：一般約 1 分鐘；強度提高或高技術／爆發動作（跳躍、舉重類）2–3 分鐘（2014 國際共識）',
+  '肌力動作也要「盡量快速向上」的意圖（2014 國際共識）',
+  '依生理成熟度與訓練年齡安排，不只看年級；同年齡生理年齡可差 4–5 歲（2014 國際共識、IOC 2015）',
+  '肌力訓練建議每週 2–3 次、非連續日 → 本課只有 1 次，請專項教練在練習日帶神經肌肉熱身補足（2014 國際共識、Faigenbaum 2002）',
+  '傷害預防應含肌力、平衡／本體感覺、跳躍落地（IOC 2015；Rössler 2014）',
+  '有疼痛或未完全恢復時，不做會負荷受傷部位的訓練（IOC 2015）',
+  '下課當下收 RPE（sRPE＝RPE×分鐘；青少年 24 小時內回報有效）',
+  '宣導睡眠 8.5–9.5 小時（IOC 2015）'
+];
+
+const PHASE_GUIDE={
+  '評估與適應':{
+    focus:'技術學習',
+    rules:[
+      '無訓練經驗者：每個動作 1–2 組、≤60%1RM 或自體重（2014 國際共識）',
+      '剛學多關節動作（如深蹲）時，一組做很多下反而不利動作學習 → 少次數、多回饋（2014 國際共識）',
+      '先學落地停住，再進到跳躍；跳躍量低',
+    ],
+    blocks:{
+      warmup:'動態熱身；低負荷技術練習，動作慢而控制',
+      speed:'落地技術為主；少量、低強度',
+      strength:'全體教學→分站；1–2 組；自體重或輕負荷；少次數重品質',
+      accessory:'平衡／本體感覺、核心、肩部；低量',
+      cooldown:'低強度伸展；回顧重點；收 RPE'
+    }
+  },
+  '基礎肌力':{
+    focus:'漸進肌力＋落地控制',
+    rules:[
+      '基本技術穩定後才進階：2–4 組×6–12 下、≤80%1RM（2014 國際共識）',
+      '只有技術維持時才增加外部負荷；不是每個動作都要做相同組數次數',
+      '效果最好的計畫多為 >8 週、多組數（2014 國際共識）→ 這 8 週是主要累積期',
+      '跳躍維持低至中強度，重落地品質',
+    ],
+    blocks:{
+      warmup:'動態熱身＋本堂主動作的低負荷技術準備',
+      speed:'低至中強度跳躍、落地停住；放在主肌力前',
+      strength:'分站輪換；2–4 組×6–12 下、≤80%1RM；組間約 1 分鐘',
+      accessory:'平衡／本體感覺、核心、肩部；每堂都有',
+      cooldown:'低強度伸展；收 RPE'
+    }
+  },
+  '寒假':{
+    focus:'停課／居家維持',
+    rules:[
+      '停訓 8–12 週肌力會回到原點（2014 國際共識）；寒假約 3 週，給簡單居家內容維持即可',
+      '居家內容應是學生已熟練、不需器材、不需監督也安全的動作'
+    ],
+    blocks:{warmup:'',speed:'',strength:'居家維持內容（每週 2–3 次，自體重、已熟練動作）',accessory:'',cooldown:''}
+  },
+  '肌力轉爆發':{
+    focus:'肌力＋爆發複合',
+    rules:[
+      '先有肌力基礎再加大爆發訓練（Behm 2017）',
+      '混齡團體用複合訓練（肌力＋跳躍）對多數人有效（Lloyd/Radnor 2016、Radnor 2017）',
+      '爆發與跳躍動作排在疲勞前、快速執行、組間 2–3 分鐘（2014 國際共識）',
+      '負荷仍以 ≤80%1RM 為主；>85%、≤6 下只適用技術已熟練者（2014 國際共識）'
+    ],
+    blocks:{
+      warmup:'動態熱身＋快速度的準備動作',
+      speed:'爆發／跳躍／變向；少次數、高品質、休息充分',
+      strength:'分站「肌力＋跳躍」配對；組間 2–3 分鐘',
+      accessory:'平衡／本體感覺、核心、肩部',
+      cooldown:'低強度伸展；收 RPE'
+    }
+  },
+  '賽前速度爆發':{
+    focus:'維持強度、降低總量、專項連結',
+    rules:[
+      '總量下降、強度維持，品質優先',
+      '專項連結的步法／體能用約 1:2 做休比（羽球回合約 7–8 秒、休息約 15 秒；Phomsoupha & Laffaye 2015）',
+    ],
+    blocks:{
+      warmup:'動態熱身＋比賽用的暖身流程',
+      speed:'專項連結的爆發、反應、步法速度；做休比約 1:2',
+      strength:'少組數、少次數、快速；組間充分休息',
+      accessory:'肩部、核心；低量',
+      cooldown:'伸展；恢復宣導；收 RPE'
+    }
+  },
+  '減量':{
+    focus:'減量、啟動、恢復',
+    rules:[
+      '訓練量減少約 40–60%、強度維持（Bosquet 2007 統合分析；研究對象為成人耐力運動員，僅供參考）',
+      '不加新動作，只做已熟練的內容',
+      '有疼痛者不做負荷患處的訓練（IOC 2015）'
+    ],
+    blocks:{
+      warmup:'比賽用的暖身流程',
+      speed:'少量、快速、輕鬆',
+      strength:'極低量或不做',
+      accessory:'',
+      cooldown:'伸展；比賽週注意事項'
+    }
+  }
+};
+
+const DEFAULT_TESTS=[
+  {k:'height',n:'身高',u:'cm',lb:false},
+  {k:'sitH',n:'坐高',u:'cm',lb:false},
+  {k:'weight',n:'體重',u:'kg',lb:false},
+  {k:'slj',n:'立定跳遠',u:'cm',lb:false},
+  {k:'cmj',n:'垂直跳（CMJ）',u:'cm',lb:false},
+  {k:'hopL',n:'單腳跳遠-左',u:'cm',lb:false},
+  {k:'hopR',n:'單腳跳遠-右',u:'cm',lb:false},
+  {k:'sixpt',n:'六點步法移位',u:'秒',lb:true},
+  {k:'side30',n:'邊線側併步 30 秒',u:'次',lb:false},
+  {k:'mbL',n:'藥球轉體側拋-左',u:'m',lb:false},
+  {k:'mbR',n:'藥球轉體側拋-右',u:'m',lb:false},
+  {k:'plank',n:'棒式',u:'秒',lb:false}
+];
+
+const WARMUP_PARTS=[
+  {k:'dyn',t:'動態熱身（約 3 分）',g:'由低到高強度的動態活動'},
+  {k:'str',t:'肌力（約 4 分）',g:'自體重的下肢、核心、肩部肌力'},
+  {k:'bal',t:'平衡／本體感覺（約 3 分）',g:'單腳穩定、有干擾的平衡'},
+  {k:'jump',t:'跳躍與落地（約 3 分）',g:'先落地停住，再進到連續跳；強調落地品質'},
+  {k:'agi',t:'專項移動（約 2 分）',g:'低量的變向、步法啟動'}
+];
+
+const REFS=[
+  {t:'Lloyd et al. 2014｜青少年阻力訓練國際共識（BJSM 48(7):498–505）',u:'https://bjsm.bmj.com/content/48/7/498',a:'組數、次數、強度、休息、頻率、技術優先、合格指導 → 各階段安排原則'},
+  {t:'Bergeron et al. 2015｜IOC 青少年運動員發展共識（BJSM 49(13):843–851）',u:'https://bjsm.bmj.com/content/49/13/843',a:'多元、技術導向的肌力體能；神經肌肉訓練預防受傷；疼痛不訓練患處；睡眠 8.5–9.5 小時'},
+  {t:'Stricker, Faigenbaum, McCambridge 2020｜AAP 臨床報告：兒童青少年阻力訓練（Pediatrics 145(6)）',u:'https://www.healthychildren.org/English/news/Pages/Guidance-on-Resistance-Training-for-Children.aspx',a:'動態熱身、低強度伸展收操、合格指導'},
+  {t:'Faigenbaum et al. 2009｜NSCA 青少年阻力訓練立場聲明（JSCR 23(S5):S60–S79）',u:'https://pubmed.ncbi.nlm.nih.gov/19620931/',a:'指導得當的青少年阻力訓練安全有效'},
+  {t:'Lloyd et al. 2016｜NSCA 長期運動發展立場聲明（JSCR 30(6):1491–1509）',u:'https://www.nsca.com/about-us/position-statements/youth-training-and-long-term-athletic-development/long-term-athletic-development-position-statement/',a:'依個別、非線性的生長發展安排'},
+  {t:'Lloyd & Oliver 2012｜Youth Physical Development Model（Strength Cond J 34(3):61–72）',u:'https://pure.cardiffmet.ac.uk/en/publications/the-youth-physical-development-model-a-new-approach-to-long-term-/',a:'依成熟度發展各項體能'},
+  {t:'Lloyd et al. 2014｜實際年齡 vs 生理成熟度（JSCR 28(5):1454–1464）',u:'https://eprints.glos.ac.uk/3538/',a:'成熟度差異大 → 依生理狀態而非年級安排'},
+  {t:'Behm et al. 2017｜肌力 vs 爆發訓練統合分析（Front Physiol 8:423）',u:'https://www.frontiersin.org/articles/10.3389/fphys.2017.00423/full',a:'先建肌力基礎再加爆發 → 階段順序'},
+  {t:'Lloyd, Radnor et al. 2016｜成熟度與訓練方式（JSCR 30(5):1239–1247）',u:'https://eprints.glos.ac.uk/2725/',a:'混齡團體用複合訓練'},
+  {t:'Faigenbaum et al. 2002｜每週 1 次 vs 2 次（Res Q Exerc Sport 73(4):416–424）',u:'https://coachsci.sdsu.edu/csa/vol96/faigenb3.htm',a:'頻率不足 → 專項教練練習日熱身'},
+  {t:'Rössler et al. 2014｜青少年傷害預防統合分析（Sports Med 44(12):1733–1748）',u:'https://pubmed.ncbi.nlm.nih.gov/25129698/',a:'含跳躍的傷害預防效果最好'},
+  {t:'Phomsoupha & Laffaye 2015｜The science of badminton（Sports Med）',u:'https://www.worldbadminton.com/reference/research/documents/The_Science_of_Badminton_Game.pdf',a:'回合與休息時間 → 做休比約 1:2'},
+  {t:'Bosquet et al. 2007｜減量統合分析（Med Sci Sports Exerc 39:1358–1365）',u:'https://www.strongerbyscience.com/tapering/',a:'減量期總量減 40–60%、維持強度（成人資料，僅供參考）'},
+  {t:'Foster et al. 2001｜sRPE（JSCR 15(1):109–115）',u:'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5673663/',a:'負荷監控方法'}
+];
+
+function defaultData(){
+  return {
+    version:1,
+    tplVer:7,
+    settings:{
+      start:'2026-11-03',end:'2027-04-13',
+      gameStart:'2027-04-17',gameEnd:'2027-04-22',gameConfirmed:false,
+      gameHost:'新北市',time:'17:00–18:30',place:'',sport:'羽球',
+      testDates:['2026-11-03','2027-01-19','2027-03-30']
+    },
+    phases:JSON.parse(JSON.stringify(DEFAULT_PHASES)),
+    tests:JSON.parse(JSON.stringify(DEFAULT_TESTS)),
+    athletes:[],
+    sessions:{
+      '2027-01-26':{status:'tbc',cancelReason:'寒假（待確認）'},
+      '2027-02-02':{status:'tbc',cancelReason:'寒假（待確認）'},
+      '2027-02-09':{status:'tbc',cancelReason:'春節連假（2/5除夕）'},
+      '2027-04-06':{status:'tbc',cancelReason:'兒童節／清明連假（待確認）'}
+    },
+    results:{}
+  };
+}
+
+let D;
+function load(){
+  try{ D=JSON.parse(localStorage.getItem(KEY)); }catch(e){ D=null; }
+  if(!D||!D.settings) D=defaultData();
+  if((D.tplVer||1)<7) upgradeData();
+}
+function upgradeData(){
+  const v=D.tplVer||1;
+  if(v<2){
+    D.settings.sport=D.settings.sport||'羽球';
+    const keep=D.tests.filter(t=>!DEFAULT_TESTS.some(n=>n.k===t.k)&&!['s10','s20','a505','pushup','sitreach'].includes(t.k));
+    D.tests=DEFAULT_TESTS.concat(keep);
+  }
+  if(v<4) D.phases.forEach(p=>{ const n=DEFAULT_PHASES.find(x=>x.name===p.name); if(n) p.goal=n.goal; });
+  if(!D.tests.some(t=>t.k==='sitH')){
+    const i=D.tests.findIndex(t=>t.k==='height');
+    D.tests.splice(i+1,0,{k:'sitH',n:'坐高',u:'cm',lb:false});
+  }
+  if(v<4) Object.values(D.sessions).forEach(s=>{
+    const used=s.status==='done'||s.actual||s.notes||Object.keys(s.attendance||{}).length;
+    if(!used){ delete s.plan; delete s.focus; }
+  });
+  if(v<5) Object.values(D.sessions).forEach(s=>{
+    const extra=[s.actual&&('實際執行：'+s.actual), s.comm&&('溝通：'+s.comm)].filter(Boolean);
+    if(extra.length){ s.notes=[s.notes].concat(extra).filter(Boolean).join('\n'); }
+    delete s.actual; delete s.comm;
+  });
+  if(v<6) Object.values(D.sessions).forEach(s=>{
+    if(s.rpe!=null) return;
+    const r=Object.values(s.attendance||{}).filter(x=>x.rpe!==''&&x.rpe!=null).map(x=>+x.rpe);
+    if(r.length) s.rpe=Math.round(r.reduce((a,b)=>a+b,0)/r.length*10)/10;
+  });
+  if(v<7) D.phases.forEach(p=>{ p.goal=(p.goal||'').replace('前測；','').replace('；1/19 期中測驗','').replace('；3/30 後測','').replace('3/30 後測。','').replace('；低強度跳躍；','；低強度跳躍。'); });
+  D.tplVer=7;
+  try{ localStorage.setItem(KEY,JSON.stringify(D)); }catch(e){}
+}
+let _saveTimer=null;
+function save(){
+  try{ localStorage.setItem(KEY,JSON.stringify(D)); }catch(e){ toast('這個視窗無法儲存資料，輸入的內容不會保留。請用 Chrome 直接開啟這個檔案。'); }
+  clearTimeout(_saveTimer);
+  _saveTimer=setTimeout(saveToFolder,800);
+  syVer++;
+  if(SY.token){ SY.dirty=true; syMeta(); syShow('待上傳…'); clearTimeout(_syTimer); _syTimer=setTimeout(syncNow,2500); }
+}
+
+// ── 雲端同步（私人 GitHub 資料庫）──────────────────────
+const SYNC_KEY='zsjh_sync';
+let SY={token:'',repo:'JhanJing/sc-planner-data',sha:'',dirty:false}, syVer=0, _syTimer=null, syBusy=false, syAgain=false;
+try{ Object.assign(SY,JSON.parse(localStorage.getItem(SYNC_KEY)||'{}')); }catch(e){}
+function syMeta(){ try{ localStorage.setItem(SYNC_KEY,JSON.stringify(SY)); }catch(e){} }
+function hhmm(){ const d=new Date(); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
+function syShow(m){ ['syncSt','syncState'].forEach(id=>{ const e=document.getElementById(id); if(e) e.textContent=(id==='syncSt'&&m?'同步：':'')+m; }); }
+const b64e=t=>btoa(unescape(encodeURIComponent(t)));
+const b64d=t=>decodeURIComponent(escape(atob(t.replace(/\s/g,''))));
+function ghData(method,body){
+  return fetch('https://api.github.com/repos/'+SY.repo+'/contents/data.json',{method,cache:'no-store',
+    headers:{'Authorization':'Bearer '+SY.token,'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'},
+    body:body?JSON.stringify(body):undefined});
+}
+async function syPush(sha){
+  const v0=syVer;
+  const body={message:'sync '+new Date().toISOString(),content:b64e(JSON.stringify(D))};
+  if(sha) body.sha=sha;
+  const r=await ghData('PUT',body);
+  if(r.status===409||r.status===422) throw new Error('版本衝突，請再按一次「立即同步」');
+  if(!r.ok) throw new Error('上傳失敗（'+r.status+'）');
+  const j=await r.json();
+  SY.sha=j.content.sha; if(syVer===v0) SY.dirty=false; syMeta();
+  syShow(SY.dirty?'待上傳…':'已同步 '+hhmm());
+}
+function adoptRemote(remote,sha){
+  D=remote; if((D.tplVer||1)<7) upgradeData();
+  try{ localStorage.setItem(KEY,JSON.stringify(D)); }catch(e){}
+  SY.sha=sha; SY.dirty=false; syMeta(); curDate=null; render(); syShow('已同步 '+hhmm());
+}
+async function syncNow(){
+  if(!SY.token){ syShow(''); return; }
+  if(syBusy){ syAgain=true; return; }
+  syBusy=true; let again=false;
+  try{
+    syShow('同步中…');
+    const r=await ghData('GET');
+    if(r.status===404){ await syPush(null); }
+    else if(r.status===401||r.status===403) throw new Error('金鑰無效或沒有權限');
+    else if(!r.ok) throw new Error('GitHub 回應 '+r.status);
+    else{
+      const j=await r.json();
+      if(j.sha===SY.sha){ if(SY.dirty) await syPush(j.sha); else syShow('已同步 '+hhmm()); }
+      else{
+        const remote=JSON.parse(b64d(j.content));
+        if(!SY.dirty) adoptRemote(remote,j.sha);
+        else if(confirm('雲端和這台裝置都有新的改動。\n\n「確定」＝改用雲端的資料（這台尚未上傳的改動會被覆蓋）\n「取消」＝用這台的資料覆蓋雲端')) adoptRemote(remote,j.sha);
+        else await syPush(j.sha);
+      }
+    }
+    again=SY.dirty;
+  }catch(e){ syShow(!navigator.onLine||e instanceof TypeError?'連不上網路，連線後自動上傳':'失敗：'+e.message); }
+  finally{ syBusy=false; if(again||syAgain){ syAgain=false; setTimeout(syncNow,800); } }
+}
+window.addEventListener('online',()=>syncNow());
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') syncNow(); });
+function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1800); }
+
+function ymd(dt){ return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0'); }
+function parse(s){ const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
+function todayStr(){ return ymd(new Date()); }
+function md(s){ const d=parse(s); return (d.getMonth()+1)+'/'+d.getDate(); }
+function allDates(){
+  const out=[]; let d=parse(D.settings.start); const e=parse(D.settings.end);
+  while(d.getDay()!==2) d.setDate(d.getDate()+1);
+  while(d<=e){ out.push(ymd(d)); d.setDate(d.getDate()+7); }
+  return out;
+}
+function phaseOf(date){ return D.phases.find(p=>date>=p.start&&date<=p.end)||null; }
+function sess(date){
+  if(!D.sessions[date]) D.sessions[date]={};
+  const s=D.sessions[date];
+  if(!s.status) s.status='planned';
+  if(!s.plan){
+    const ph=phaseOf(date); const g=ph?PHASE_GUIDE[ph.name]:null;
+    s.plan={}; BLOCKS.forEach(b=>s.plan[b.k]=[]);
+    if(!s.focus) s.focus=g?g.focus:'';
+  }
+  BLOCKS.forEach(b=>{ const v=s.plan[b.k]; if(!Array.isArray(v)) s.plan[b.k]=String(v||'').split('\n').map(x=>x.trim()).filter(Boolean).map(x=>({name:x,sets:'',reps:'',note:''})); });
+  if(!s.attendance) s.attendance={};
+  return s;
+}
+function peek(date){ return D.sessions[date]||{status:'planned'}; }
+function activeAthletes(){ return D.athletes.filter(a=>a.active!==false); }
+const ST={planned:'未上課',done:'已完成',cancelled:'停課',tbc:'待確認'};
+
+let curTab='session', curDate=null;
+function show(tab){
+  curTab=tab;
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===tab));
+  document.querySelectorAll('main>section').forEach(s=>s.classList.toggle('hide',s.id!=='tab-'+tab));
+  render();
+}
+$('nav').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b) show(b.dataset.tab); });
+
+function nextDate(){ const t=todayStr(); return allDates().find(d=>d>=t)||null; }
+
+function renderHeader(){
+  const s=D.settings;
+  $('hdrSub').textContent='每週二 '+s.time+(s.place?' ｜ '+s.place:'')+(s.sport?' ｜ '+s.sport:'')+' ｜ '+s.start+' → '+s.end;
+  const days=Math.ceil((parse(s.gameStart)-parse(todayStr()))/86400000);
+  $('hdrCd').innerHTML='距全中運'+(s.gameConfirmed?'':'（推估）')+'<br><b>'+(days>=0?days:0)+'</b> 天';
+}
+
+function renderOverview(){
+  const dates=allDates(), nx=nextDate();
+  const live=dates.filter(d=>!['cancelled','tbc'].includes(peek(d).status));
+  const done=dates.filter(d=>peek(d).status==='done').length;
+  const s=D.settings;
+  const t0=parse(dates[0]), t1=parse(dates[dates.length-1]); const span=(t1-t0)||1;
+  let bar='';
+  D.phases.forEach(p=>{
+    const a=Math.max(parse(p.start),t0), b=Math.min(parse(p.end),t1);
+    const w=Math.max(((b-a)+7*86400000)/(span+7*86400000)*100,4);
+    bar+=`<div style="background:${p.color};width:${w}%" title="${esc(p.name)}">${esc(p.name)}</div>`;
+  });
+  let rows='';
+  dates.forEach(d=>{
+    const ss=peek(d), ph=phaseOf(d);
+    const cls=(d===nx?'next ':'')+(d<todayStr()?'past ':'')+'click';
+    const st=ss.status||'planned';
+    rows+=`<tr class="${cls}" data-d="${d}">
+      <td>${md(d)}（二）${d===nx?'<span class="tag">下一堂</span>':''}</td>
+      <td>${ph?`<span style="color:${ph.color};font-weight:600">${esc(ph.name)}</span>`:'—'}</td>
+      <td><span class="pill st-${st}">${ST[st]}</span> <span class="muted">${esc(['cancelled','tbc'].includes(st)?ss.cancelReason||'':'')}</span></td></tr>`;
+  });
+  $('tab-overview').innerHTML=`
+  <div class="card">
+    <p style="margin:0 0 10px">共 <b>${dates.length}</b> 堂，預計上課 <b>${live.length}</b>，已完成 <b>${done}</b>　｜　全中運${s.gameConfirmed?'':'（推估）'} <b>${md(s.gameStart)}–${md(s.gameEnd)}</b></p>
+    <div class="phasebar">${bar}</div>
+    <div class="muted">${D.phases.map(p=>`<span style="color:${p.color}">■</span> ${esc(p.name)} ${md(p.start)}–${md(p.end)}`).join('　')}</div>
+    ${s.gameConfirmed?'':'<p class="muted" style="margin-bottom:0">全中運日期官方尚未公布，目前是推估；公布後到「更多 → 設定與備份」修改。</p>'}
+  </div>
+  <div class="card">
+    <h2>上課時程（點一列進入該堂）</h2>
+    <table><tr><th>日期</th><th>階段</th><th>狀態</th></tr>${rows}</table>
+  </div>`;
+  $('tab-overview').querySelectorAll('tr[data-d]').forEach(tr=>tr.onclick=()=>{ curDate=tr.dataset.d; show('session'); });
+}
+
+function renderSession(){
+  const dates=allDates();
+  if(!curDate||!dates.includes(curDate)) curDate=nextDate()||dates[dates.length-1];
+  const s=sess(curDate), ph=phaseOf(curDate), idx=dates.indexOf(curDate);
+  const guide=ph?PHASE_GUIDE[ph.name]:null;
+  const stopped=['cancelled','tbc'].includes(s.status);
+  $('tab-session').innerHTML=`
+  <div class="card">
+    <div class="row">
+      <button class="b g" id="prevS" ${idx<=0?'disabled':''}>←</button>
+      <select id="pickS">${dates.map((d,i)=>`<option value="${d}" ${d===curDate?'selected':''}>第${i+1}堂 ${md(d)}</option>`).join('')}</select>
+      <button class="b g" id="nextS" ${idx>=dates.length-1?'disabled':''}>→</button>
+      <select id="sStatus">${Object.entries(ST).map(([k,v])=>`<option value="${k}" ${s.status===k?'selected':''}>${v}</option>`).join('')}</select>
+      <span style="margin-left:auto">${ph?`<b style="color:${ph.color}">${esc(ph.name)}</b>`:''}</span>
+    </div>
+    <input id="sReason" placeholder="停課／待確認原因" value="${esc(s.cancelReason||'')}" style="width:100%;margin-top:8px" class="${stopped?'':'hide'}">
+  </div>
+  <div class="grid2" style="grid-template-columns:1.7fr 1fr">
+    <div class="card">
+      <h2>課程計畫</h2>
+      ${guide?`<details class="guide"><summary>本階段安排原則</summary><p class="muted">${esc(ph.goal)}</p><ul>${guide.rules.map(r=>`<li>${esc(r)}</li>`).join('')}</ul>
+        <details><summary class="muted">每堂共通原則</summary><ul>${COMMON_RULES.map(r=>`<li>${esc(r)}</li>`).join('')}</ul></details></details>`:''}
+      ${BLOCKS.map(b=>{ const hint=guide&&guide.blocks[b.k]; return `<div class="blk"><div class="t">${b.t}</div>${hint?`<div class="muted">${esc(hint)}</div>`:''}
+        ${s.plan[b.k].map((r,i)=>`<div class="ex">
+          <input class="exn" data-p="${b.k}.${i}.name" value="${esc(r.name)}" placeholder="動作名稱">
+          <input class="exs" data-p="${b.k}.${i}.sets" value="${esc(r.sets)}" placeholder="組數">
+          <input class="exr" data-p="${b.k}.${i}.reps" value="${esc(r.reps)}" placeholder="次數">
+          <input class="exo" data-p="${b.k}.${i}.note" value="${esc(r.note)}" placeholder="備註">
+          <button class="b r" data-xdel="${b.k}.${i}" title="刪除">×</button></div>`).join('')}
+        <button class="b g" data-xadd="${b.k}">＋ 新增動作</button></div>`; }).join('')}
+      <button class="b g" id="copyPrev" ${idx<=0?'disabled':''}>複製上一堂計畫</button>
+    </div>
+    <div>
+      <div class="card">
+        <h2>本堂強度</h2>
+        <div class="row">
+          <label class="muted">RPE（0–10，下課當下問大家的平均感受）<input type="number" id="sRpe" min="0" max="10" step="0.5" value="${s.rpe??''}" style="width:72px"></label>
+          <label class="muted">分鐘 <input type="number" id="sMin" value="${s.minutes??90}" style="width:72px"></label>
+        </div>
+        <p class="muted" id="attSum" style="margin-bottom:0"></p>
+      </div>
+      <div class="card">
+        <h2>課後紀錄</h2>
+        <textarea id="sNotes" style="min-height:90px" placeholder="實際執行、觀察、下次調整、與專項教練溝通">${esc(s.notes||'')}</textarea>
+      </div>
+    </div>
+  </div>`;
+  const T=$('tab-session');
+  $('pickS').onchange=e=>{ curDate=e.target.value; renderSession(); };
+  $('prevS').onclick=()=>{ curDate=dates[idx-1]; renderSession(); };
+  $('nextS').onclick=()=>{ curDate=dates[idx+1]; renderSession(); };
+  $('sStatus').onchange=e=>{ s.status=e.target.value; save(); renderSession(); renderHeader(); };
+  $('sReason').oninput=e=>{ s.cancelReason=e.target.value; save(); };
+  $('sNotes').oninput=e=>{ s.notes=e.target.value; save(); };
+  T.querySelectorAll('[data-p]').forEach(i=>i.oninput=()=>{ const [k,n,f]=i.dataset.p.split('.'); s.plan[k][+n][f]=i.value; save(); });
+  T.querySelectorAll('[data-xadd]').forEach(b=>b.onclick=()=>{
+    const k=b.dataset.xadd; s.plan[k].push({name:'',sets:'',reps:'',note:''}); save(); renderSession();
+    const l=[...$('tab-session').querySelectorAll('[data-p^="'+k+'."][data-p$=".name"]')].pop(); if(l) l.focus();
+  });
+  T.querySelectorAll('[data-xdel]').forEach(b=>b.onclick=()=>{ const [k,n]=b.dataset.xdel.split('.'); s.plan[k].splice(+n,1); save(); renderSession(); });
+  $('copyPrev').onclick=()=>{
+    const p=sess(dates[idx-1]); if(!confirm('用 '+md(dates[idx-1])+' 的計畫覆蓋本堂？')) return;
+    s.plan=JSON.parse(JSON.stringify(p.plan)); save(); renderSession();
+  };
+  const sumUp=()=>{ $('attSum').textContent=(s.rpe===''||s.rpe==null)?'':'sRPE（RPE × 分鐘）＝ '+Math.round(s.rpe*(s.minutes??90)); };
+  $('sRpe').oninput=e=>{ s.rpe=e.target.value===''?'':+e.target.value; save(); sumUp(); };
+  $('sMin').oninput=e=>{ s.minutes=+e.target.value||0; save(); sumUp(); };
+  sumUp();
+}
+
+function renderLoad(){
+  const data=allDates().filter(d=>peek(d).status==='done'&&peek(d).rpe!==''&&peek(d).rpe!=null).map(d=>{
+    const ss=D.sessions[d];
+    return {d,rpe:+ss.rpe,srpe:Math.round(ss.rpe*(ss.minutes??90))};
+  });
+  const W=700,H=180,pad=30, mx=Math.max(900,...data.map(x=>x.srpe));
+  const bw=data.length?(W-pad*2)/data.length:0;
+  const bars=data.map((x,i)=>{
+    const h=(x.srpe/mx)*(H-pad*2);
+    return `<rect x="${pad+i*bw+3}" y="${H-pad-h}" width="${Math.max(bw-6,2)}" height="${h}" fill="#E2873B"><title>${x.d} sRPE ${x.srpe}</title></rect>
+      <text x="${pad+i*bw+bw/2}" y="${H-pad+14}" font-size="10" text-anchor="middle" fill="#6b7280">${md(x.d)}</text>`;
+  }).join('');
+  $('tab-load').innerHTML=data.length?`
+  <svg viewBox="0 0 ${W} ${H}" class="chart"><line x1="${pad}" y1="${H-pad}" x2="${W-pad}" y2="${H-pad}" stroke="#ccc"/>${bars}</svg>
+  <table><tr><th>日期</th><th>RPE</th><th>sRPE</th></tr>
+  ${data.map(x=>`<tr><td>${x.d}</td><td>${x.rpe}</td><td>${x.srpe}</td></tr>`).join('')}</table>`
+  :'<p class="muted">課堂標成「已完成」並填入 RPE 後，這裡會顯示每堂的 sRPE。</p>';
+}
+
+function renderSettings(){
+  const s=D.settings;
+  $('tab-settings').innerHTML=`
+  <div class="card"><h2>基本資料</h2>
+    <div class="grid2">
+      <div><label class="f">開始日期</label><input type="date" id="cStart" value="${s.start}"></div>
+      <div><label class="f">最後一堂</label><input type="date" id="cEnd" value="${s.end}"></div>
+      <div><label class="f">全中運開始</label><input type="date" id="cGs" value="${s.gameStart}"></div>
+      <div><label class="f">全中運結束</label><input type="date" id="cGe" value="${s.gameEnd}"></div>
+      <div><label class="f">承辦縣市</label><input id="cHost" value="${esc(s.gameHost)}"></div>
+      <div><label class="f">&nbsp;</label><label><input type="checkbox" id="cConf" ${s.gameConfirmed?'checked':''}> 日期已由官方確認</label></div>
+      <div><label class="f">上課時間</label><input id="cTime" value="${esc(s.time)}"></div>
+      <div><label class="f">場地</label><input id="cPlace" value="${esc(s.place)}"></div>
+      <div><label class="f">運動項目（隊伍）</label><input id="cSport" value="${esc(s.sport)}" placeholder="例如：田徑、籃球…"></div>
+    </div>
+  </div>
+  <div class="card"><h2>週期階段</h2>
+    <table><tr><th>名稱</th><th>開始</th><th>結束</th><th>顏色</th><th>目標</th><th></th></tr>
+    ${D.phases.map((p,i)=>`<tr>
+      <td><input data-p="${i}" data-f="name" value="${esc(p.name)}" style="width:110px"></td>
+      <td><input type="date" data-p="${i}" data-f="start" value="${p.start}"></td>
+      <td><input type="date" data-p="${i}" data-f="end" value="${p.end}"></td>
+      <td><input type="color" data-p="${i}" data-f="color" value="${p.color}"></td>
+      <td><textarea data-p="${i}" data-f="goal" style="min-height:40px">${esc(p.goal)}</textarea></td>
+      <td><button class="b r" data-pdel="${i}">刪</button></td></tr>`).join('')}
+    </table>
+    <button class="b g" id="addP">新增階段</button>
+    <p class="muted">階段名稱為（評估與適應、基礎肌力、寒假、肌力轉爆發、賽前速度爆發、減量）時，單堂課頁會顯示該階段的安排原則。</p>
+  </div>
+  <div class="card"><h2>手機與電腦同步</h2>
+    <p class="muted">資料存到你的私人 GitHub 資料庫，手機和電腦開同一個網頁、貼上同一把金鑰就會同步。金鑰只存在這台裝置。<br>
+    狀態：<b id="syncState">${SY.token?'已設定':'未設定'}</b></p>
+    <label class="f">資料庫（帳號/名稱）</label>
+    <input id="syRepo" value="${esc(SY.repo)}" style="width:100%">
+    <label class="f">金鑰</label>
+    <input id="syToken" type="password" placeholder="${SY.token?'已儲存（要更換才貼新的）':'貼上 GitHub 金鑰'}" style="width:100%" autocomplete="off">
+    <div class="row" style="margin-top:8px">
+      <button class="b" id="syOn">儲存並同步</button>
+      <button class="b g" id="syNow">立即同步</button>
+      <button class="b r" id="syOff">清除金鑰</button>
+    </div>
+  </div>
+  <div class="card"><h2>備份</h2>
+    <p class="muted">資料自動存在這台電腦的瀏覽器。建議再設定「自動存到資料夾」，每次修改都會寫一份 中山國中_autosave.json 到你選的資料夾。<br>
+    資料夾自動儲存：<b id="fsState">檢查中…</b></p>
+    <div class="row">
+      <button class="b" id="pickDir">設定自動儲存資料夾</button>
+      <button class="b g" id="exp">匯出備份 JSON</button>
+      <label class="b g" style="display:inline-block">匯入備份<input type="file" id="imp" accept=".json" class="hide"></label>
+    </div>
+  </div>`;
+  const bind=(id,k,re)=>$(id).onchange=e=>{ s[k]=e.target.type==='checkbox'?e.target.checked:e.target.value; save(); renderHeader(); if(re) renderSettings(); };
+  bind('cStart','start'); bind('cEnd','end'); bind('cGs','gameStart'); bind('cGe','gameEnd'); bind('cHost','gameHost');
+  bind('cConf','gameConfirmed'); bind('cTime','time'); bind('cPlace','place'); bind('cSport','sport');
+  const T=$('tab-settings');
+  T.querySelectorAll('[data-p]').forEach(i=>i.onchange=()=>{ D.phases[+i.dataset.p][i.dataset.f]=i.value; D.phases.sort((a,b)=>a.start<b.start?-1:1); save(); renderSettings(); });
+  T.querySelectorAll('[data-pdel]').forEach(b=>b.onclick=()=>{ if(confirm('刪除此階段？')){ D.phases.splice(+b.dataset.pdel,1); save(); renderSettings(); } });
+  $('addP').onclick=()=>{ D.phases.push({id:uid(),name:'新階段',start:s.end,end:s.end,color:'#888888',goal:''}); save(); renderSettings(); };
+  $('exp').onclick=()=>{
+    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(D,null,2)],{type:'application/json'}));
+    a.download='中山國中_備份_'+todayStr()+'.json'; a.click();
+  };
+  $('imp').onchange=async e=>{
+    const f=e.target.files[0]; if(!f) return;
+    try{ const d=JSON.parse(await f.text()); if(!d.settings||!d.sessions) throw new Error('格式不符');
+      if(!confirm('匯入會覆蓋目前所有資料，確定？')) return; D=d; save(); render(); toast('已匯入'); }
+    catch(err){ alert('匯入失敗：'+err.message); }
+  };
+  $('pickDir').onclick=pickDir;
+  $('syOn').onclick=()=>{
+    const t=$('syToken').value.trim(); if(t) SY.token=t;
+    SY.repo=$('syRepo').value.trim()||SY.repo; SY.sha=''; syMeta();
+    if(!SY.token){ toast('請先貼上金鑰'); return; }
+    syncNow(); renderSettings();
+  };
+  $('syNow').onclick=()=>syncNow();
+  $('syOff').onclick=()=>{ if(confirm('清除這台裝置上的金鑰？（雲端資料不會被刪）')){ SY.token=''; SY.sha=''; SY.dirty=false; syMeta(); syShow(''); renderSettings(); } };
+  fsStatus();
+}
+
+function openIDB(){ return new Promise((res,rej)=>{ const r=indexedDB.open('zsjh_sc',1); r.onupgradeneeded=e=>e.target.result.createObjectStore('kv'); r.onsuccess=e=>res(e.target.result); r.onerror=rej; }); }
+async function idbGet(k){ const db=await openIDB(); return new Promise(res=>{ const r=db.transaction('kv').objectStore('kv').get(k); r.onsuccess=()=>res(r.result); r.onerror=()=>res(null); }); }
+async function idbSet(k,v){ const db=await openIDB(); return new Promise(res=>{ const t=db.transaction('kv','readwrite'); t.objectStore('kv').put(v,k); t.oncomplete=res; }); }
+async function pickDir(){
+  if(!window.showDirectoryPicker){ alert('此瀏覽器不支援資料夾自動儲存，請用 Chrome，或定期按「匯出備份」。'); return; }
+  try{ const h=await window.showDirectoryPicker({mode:'readwrite'}); await idbSet('dir',h); await saveToFolder(); fsStatus(); toast('已設定自動儲存'); }
+  catch(e){ if(e.name!=='AbortError') alert(e.message); }
+}
+async function saveToFolder(){
+  try{
+    const h=await idbGet('dir'); if(!h) return false;
+    if(await h.queryPermission({mode:'readwrite'})!=='granted') return false;
+    const fh=await h.getFileHandle('中山國中_autosave.json',{create:true});
+    const w=await fh.createWritable(); await w.write(JSON.stringify(D,null,1)); await w.close(); return true;
+  }catch(e){ return false; }
+}
+async function fsStatus(){
+  const el=$('fsState'); if(!el) return;
+  try{
+    const h=await idbGet('dir');
+    if(!h){ el.textContent='尚未設定'; return; }
+    const p=await h.queryPermission({mode:'readwrite'});
+    el.innerHTML=p==='granted'?'✅ 已啟用（'+esc(h.name)+'）':'⚠️ 需要重新授權（'+esc(h.name)+'）<button class="b o" id="reauth" style="margin-left:6px">授權</button>';
+    if($('reauth')) $('reauth').onclick=async()=>{ if(await h.requestPermission({mode:'readwrite'})==='granted'){ await saveToFolder(); fsStatus(); } };
+  }catch(e){ el.textContent='無法使用'; }
+}
+
+function renderWarmup(){
+  const W=D.coachWarmup||(D.coachWarmup={});
+  $('tab-warmup').innerHTML=`
+  <div class="card noprint">
+    <p class="muted" style="margin-top:0">每週只上一次肌力課不夠（建議每週 2–3 次，2014 國際共識），請專項教練在練習日帶 15 分鐘神經肌肉熱身。時間分配是建議架構，內容自行填寫；可分前後兩期各寫一版。</p>
+    <button class="b" onclick="window.print()">列印／存成 PDF</button>
+  </div>
+  ${['A','B'].map(v=>`<div class="card"><h2>版本 ${v}<input data-wn="${v}" value="${esc(W['name'+v]||(v==='A'?'11月–1月':'2月–全中運'))}" style="margin-left:8px;width:160px"></h2>
+    ${WARMUP_PARTS.map(p=>`<div class="blk"><div class="t">${p.t}</div>
+      <textarea data-wu="${v}_${p.k}" style="min-height:44px" placeholder="${esc(p.g)}">${esc(W[v+'_'+p.k]||'')}</textarea></div>`).join('')}
+    </div>`).join('')}`;
+  const T=$('tab-warmup');
+  T.querySelectorAll('[data-wu]').forEach(t=>t.oninput=()=>{ W[t.dataset.wu]=t.value; save(); });
+  T.querySelectorAll('[data-wn]').forEach(t=>t.oninput=()=>{ W['name'+t.dataset.wn]=t.value; save(); });
+}
+
+function renderRefs(){
+  $('tab-refs').innerHTML=`
+  <div class="card">
+    <p class="muted" style="margin-top:0">完整整理見同資料夾的「訓練依據文獻.md」。2014 國際共識與 IOC 2015 的數字取自原文；其他多為摘要與二手整理，引用前請查原文。</p>
+    <table><tr><th>文獻</th><th>用在計畫的哪裡</th></tr>
+    ${REFS.map(r=>`<tr><td><a href="${esc(r.u)}" target="_blank" rel="noopener">${esc(r.t)}</a></td><td>${esc(r.a)}</td></tr>`).join('')}
+    </table>
+  </div>
+`;
+}
+
+function render(){
+  renderHeader();
+  if(curTab==='more'){ renderWarmup(); renderLoad(); renderRefs(); renderSettings(); return; }
+  ({overview:renderOverview,session:renderSession})[curTab]();
+}
+load(); render();
+if(SY.token){ syShow(SY.dirty?'待上傳…':''); syncNow(); }
+if('serviceWorker' in navigator && location.protocol==='https:') navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
