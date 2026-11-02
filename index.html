@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>中山國中 肌力與體能</title>
 <meta name="theme-color" content="#18243A">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -18,7 +18,7 @@
 }
 *{box-sizing:border-box}
 body{margin:0;font-family:"PingFang TC","Noto Sans TC",sans-serif;background:var(--cream);color:var(--ink);font-size:14px}
-header{background:var(--navy);color:var(--cream);padding:14px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+header{background:var(--navy);color:var(--cream);padding:calc(14px + env(safe-area-inset-top,0px)) 20px 14px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 header h1{font-size:18px;margin:0;font-weight:600}
 header .sub{font-size:12px;opacity:.75}
 header .cd{margin-left:auto;text-align:right}
@@ -26,7 +26,7 @@ header .cd b{color:var(--orange);font-size:22px}
 nav{display:flex;gap:4px;padding:0 16px;background:var(--navy);border-bottom:3px solid var(--orange);overflow-x:auto}
 nav button{background:none;border:0;color:#c9cfdb;padding:10px 14px;font-size:14px;cursor:pointer;white-space:nowrap;font-family:inherit}
 nav button.on{color:#fff;border-bottom:3px solid var(--orange);margin-bottom:-3px;font-weight:600}
-main{padding:18px;max-width:1200px;margin:0 auto}
+main{padding:18px 18px calc(30px + env(safe-area-inset-bottom,0px));max-width:1200px;margin:0 auto}
 .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:14px}
 .card h2{font-size:16px;margin:0 0 10px;color:var(--navy)}
 .card h3{font-size:14px;margin:14px 0 6px;color:var(--navy)}
@@ -59,8 +59,13 @@ tr.next td{background:#fff3e3}
 .att td input[type=number]{width:72px}
 .blk{border-left:4px solid var(--orange);padding-left:10px;margin:10px 0}
 .blk .t{font-weight:600;color:var(--navy);font-size:13px}
-.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:8px 16px;border-radius:8px;opacity:0;transition:.3s;pointer-events:none}
+.toast{position:fixed;bottom:calc(18px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:8px 16px;border-radius:8px;opacity:0;transition:.3s;pointer-events:none}
 .toast.show{opacity:1}
+.toast.act{pointer-events:auto}
+.tact{margin-left:12px;background:var(--orange);color:#fff;border:0;border-radius:6px;padding:6px 12px;font:inherit}
+button,input,select,textarea,summary{touch-action:manipulation}
+#syncSt.link{cursor:pointer;text-decoration:underline dotted}
+#copyFrom{margin-top:6px;max-width:100%}
 .up{color:var(--ok);font-weight:600} .down{color:var(--warn);font-weight:600}
 .hide{display:none}
 .chart{width:100%;height:180px}
@@ -74,7 +79,8 @@ tr.next td{background:#fff3e3}
 @media(max-width:600px){
   body{font-size:15px}
   input,select,textarea{font-size:16px}
-  header{padding:12px 14px} main{padding:12px}
+  header{padding:calc(12px + env(safe-area-inset-top,0px)) 14px 12px} main{padding:12px 12px calc(30px + env(safe-area-inset-bottom,0px))}
+  button.b{min-height:40px} input,select{min-height:40px}
   .card{padding:12px}
   .ex{flex-wrap:wrap}
   .exn{flex:1 1 100%}
@@ -279,6 +285,14 @@ const REFS=[
   {t:'Foster et al. 2001｜sRPE（JSCR 15(1):109–115）',u:'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5673663/',a:'負荷監控方法'}
 ];
 
+const APP_VER='2026-11-02 v2';
+function validData(d){ return !!(d&&typeof d==='object'&&d.settings&&d.sessions&&Array.isArray(d.phases)); }
+function hasContent(d){
+  return Object.values((d&&d.sessions)||{}).some(x=>x.status==='done'||x.notes||(x.rpe!=null&&x.rpe!=='')||(x.plan&&Object.values(x.plan).some(v=>Array.isArray(v)?v.some(r=>r.name):String(v||'').trim())));
+}
+function stashPrev(){ if(!hasContent(D)) return; try{ localStorage.setItem('zsjh_sc_prev',JSON.stringify({at:Date.now(),d:D})); }catch(e){} }
+function hasPrev(){ try{ return !!localStorage.getItem('zsjh_sc_prev'); }catch(e){ return false; } }
+
 function defaultData(){
   return {
     version:1,
@@ -353,7 +367,8 @@ let SY={token:'',repo:'JhanJing/sc-planner-data',sha:'',dirty:false}, syVer=0, _
 try{ Object.assign(SY,JSON.parse(localStorage.getItem(SYNC_KEY)||'{}')); }catch(e){}
 function syMeta(){ try{ localStorage.setItem(SYNC_KEY,JSON.stringify(SY)); }catch(e){} }
 function hhmm(){ const d=new Date(); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
-function syShow(m){ ['syncSt','syncState'].forEach(id=>{ const e=document.getElementById(id); if(e) e.textContent=(id==='syncSt'&&m?'同步：':'')+m; }); }
+let syLast='';
+function syShow(m){ syLast=m; const st=document.getElementById('syncSt'); if(st) st.classList.toggle('link',!!SY.token); ['syncSt','syncState'].forEach(id=>{ const e=document.getElementById(id); if(e) e.textContent=(id==='syncSt'&&m?'同步：':'')+m; }); }
 const b64e=t=>btoa(unescape(encodeURIComponent(t)));
 const b64d=t=>decodeURIComponent(escape(atob(t.replace(/\s/g,''))));
 function ghData(method,body){
@@ -373,7 +388,7 @@ async function syPush(sha){
   syShow(SY.dirty?'待上傳…':'已同步 '+hhmm());
 }
 function adoptRemote(remote,sha){
-  D=remote; if((D.tplVer||1)<7) upgradeData();
+  stashPrev(); D=remote; if((D.tplVer||1)<7) upgradeData();
   try{ localStorage.setItem(KEY,JSON.stringify(D)); }catch(e){}
   SY.sha=sha; SY.dirty=false; syMeta(); curDate=null; render(); syShow('已同步 '+hhmm());
 }
@@ -392,8 +407,10 @@ async function syncNow(){
       if(j.sha===SY.sha){ if(SY.dirty) await syPush(j.sha); else syShow('已同步 '+hhmm()); }
       else{
         const remote=JSON.parse(b64d(j.content));
-        if(!SY.dirty) adoptRemote(remote,j.sha);
-        else if(confirm('雲端和這台裝置都有新的改動。\n\n「確定」＝改用雲端的資料（這台尚未上傳的改動會被覆蓋）\n「取消」＝用這台的資料覆蓋雲端')) adoptRemote(remote,j.sha);
+        if(!validData(remote)) throw new Error('雲端的 data.json 格式不對');
+        const firstWithData=(SY.sha===''&&hasContent(D));
+        if(!SY.dirty&&!firstWithData) adoptRemote(remote,j.sha);
+        else if(confirm('雲端和這台裝置的資料不一樣。\n\n「確定」＝改用雲端的資料（這台的資料會被取代，之後可在設定還原）\n「取消」＝用這台的資料覆蓋雲端')) adoptRemote(remote,j.sha);
         else await syPush(j.sha);
       }
     }
@@ -402,8 +419,13 @@ async function syncNow(){
   finally{ syBusy=false; if(again||syAgain){ syAgain=false; setTimeout(syncNow,800); } }
 }
 window.addEventListener('online',()=>syncNow());
-document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') syncNow(); });
-function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1800); }
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible'||SY.dirty) syncNow(); });
+function toast(m,act,ms){
+  const t=$('toast'); t.textContent=m;
+  if(act){ const b=document.createElement('button'); b.className='tact'; b.textContent=act.label; b.onclick=()=>{ act.fn(); t.classList.remove('show','act'); }; t.appendChild(b); t.classList.add('act'); }
+  else t.classList.remove('act');
+  t.classList.add('show'); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('show','act'),ms||(act?6000:1800));
+}
 
 function ymd(dt){ return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0'); }
 function parse(s){ const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
@@ -430,7 +452,6 @@ function sess(date){
   return s;
 }
 function peek(date){ return D.sessions[date]||{status:'planned'}; }
-function activeAthletes(){ return D.athletes.filter(a=>a.active!==false); }
 const ST={planned:'未上課',done:'已完成',cancelled:'停課',tbc:'待確認'};
 
 let curTab='session', curDate=null;
@@ -446,13 +467,14 @@ function nextDate(){ const t=todayStr(); return allDates().find(d=>d>=t)||null; 
 
 function renderHeader(){
   const s=D.settings;
-  $('hdrSub').textContent='每週二 '+s.time+(s.place?' ｜ '+s.place:'')+(s.sport?' ｜ '+s.sport:'')+' ｜ '+s.start+' → '+s.end;
+  $('hdrSub').textContent='每週二 '+s.time+(s.place?'｜'+s.place:'')+(s.sport?'｜'+s.sport:'');
   const days=Math.ceil((parse(s.gameStart)-parse(todayStr()))/86400000);
   $('hdrCd').innerHTML='距全中運'+(s.gameConfirmed?'':'（推估）')+'<br><b>'+(days>=0?days:0)+'</b> 天';
 }
 
 function renderOverview(){
   const dates=allDates(), nx=nextDate();
+  if(!dates.length){ $('tab-overview').innerHTML='<div class="card"><p>沒有符合的上課日，請到「更多 → 設定與備份」檢查開始與最後一堂日期。</p></div>'; return; }
   const live=dates.filter(d=>!['cancelled','tbc'].includes(peek(d).status));
   const done=dates.filter(d=>peek(d).status==='done').length;
   const s=D.settings;
@@ -484,23 +506,37 @@ function renderOverview(){
     <h2>上課時程（點一列進入該堂）</h2>
     <table><tr><th>日期</th><th>階段</th><th>狀態</th></tr>${rows}</table>
   </div>`;
-  $('tab-overview').querySelectorAll('tr[data-d]').forEach(tr=>tr.onclick=()=>{ curDate=tr.dataset.d; show('session'); });
+  $('tab-overview').querySelectorAll('tr[data-d]').forEach(tr=>tr.onclick=()=>{ curDate=tr.dataset.d; show('session'); window.scrollTo(0,0); });
+  const nr=$('tab-overview').querySelector('tr.next'); if(nr) nr.scrollIntoView({block:'center'});
+}
+
+function countRows(ss){
+  if(!ss||!ss.plan) return 0;
+  return BLOCKS.reduce((n,b)=>{ const v=ss.plan[b.k]; return n+(Array.isArray(v)?v.filter(r=>r.name).length:(String(v||'').trim()?1:0)); },0);
+}
+function exerciseNames(){
+  const set=new Set();
+  Object.values(D.sessions).forEach(x=>{ if(x.plan) Object.values(x.plan).forEach(v=>{ if(Array.isArray(v)) v.forEach(r=>{ if(r.name) set.add(r.name); }); }); });
+  return [...set];
 }
 
 function renderSession(){
   const dates=allDates();
+  if(!dates.length){ $('tab-session').innerHTML='<div class="card"><p>沒有符合的上課日，請到「更多 → 設定與備份」檢查開始與最後一堂日期。</p></div>'; return; }
   if(!curDate||!dates.includes(curDate)) curDate=nextDate()||dates[dates.length-1];
   const s=sess(curDate), ph=phaseOf(curDate), idx=dates.indexOf(curDate);
   const guide=ph?PHASE_GUIDE[ph.name]:null;
   const stopped=['cancelled','tbc'].includes(s.status);
+  const mark={done:'✓ ',cancelled:'✕ ',tbc:'？'};
+  const srcs=dates.filter(d=>d!==curDate&&countRows(peek(d))>0);
   $('tab-session').innerHTML=`
   <div class="card">
     <div class="row">
       <button class="b g" id="prevS" ${idx<=0?'disabled':''}>←</button>
-      <select id="pickS">${dates.map((d,i)=>`<option value="${d}" ${d===curDate?'selected':''}>第${i+1}堂 ${md(d)}</option>`).join('')}</select>
+      <select id="pickS">${dates.map((d,i)=>`<option value="${d}" ${d===curDate?'selected':''}>${mark[peek(d).status]||''}第${i+1}堂 ${md(d)}</option>`).join('')}</select>
       <button class="b g" id="nextS" ${idx>=dates.length-1?'disabled':''}>→</button>
       <select id="sStatus">${Object.entries(ST).map(([k,v])=>`<option value="${k}" ${s.status===k?'selected':''}>${v}</option>`).join('')}</select>
-      <span style="margin-left:auto">${ph?`<b style="color:${ph.color}">${esc(ph.name)}</b>`:''}</span>
+      <span style="margin-left:auto">${curDate===todayStr()?'<span class="tag">今天</span> ':''}${ph?`<b style="color:${ph.color}">${esc(ph.name)}</b>`:''}</span>
     </div>
     <input id="sReason" placeholder="停課／待確認原因" value="${esc(s.cancelReason||'')}" style="width:100%;margin-top:8px" class="${stopped?'':'hide'}">
   </div>
@@ -511,20 +547,21 @@ function renderSession(){
         <details><summary class="muted">每堂共通原則</summary><ul>${COMMON_RULES.map(r=>`<li>${esc(r)}</li>`).join('')}</ul></details></details>`:''}
       ${BLOCKS.map(b=>{ const hint=guide&&guide.blocks[b.k]; return `<div class="blk"><div class="t">${b.t}</div>${hint?`<div class="muted">${esc(hint)}</div>`:''}
         ${s.plan[b.k].map((r,i)=>`<div class="ex">
-          <input class="exn" data-p="${b.k}.${i}.name" value="${esc(r.name)}" placeholder="動作名稱">
-          <input class="exs" data-p="${b.k}.${i}.sets" value="${esc(r.sets)}" placeholder="組數">
-          <input class="exr" data-p="${b.k}.${i}.reps" value="${esc(r.reps)}" placeholder="次數">
-          <input class="exo" data-p="${b.k}.${i}.note" value="${esc(r.note)}" placeholder="備註">
+          <input class="exn" list="exList" data-p="${b.k}.${i}.name" value="${esc(r.name)}" placeholder="動作名稱" enterkeyhint="next">
+          <input class="exs" data-p="${b.k}.${i}.sets" value="${esc(r.sets)}" placeholder="組數" enterkeyhint="next">
+          <input class="exr" data-p="${b.k}.${i}.reps" value="${esc(r.reps)}" placeholder="次數" enterkeyhint="next">
+          <input class="exo" data-p="${b.k}.${i}.note" value="${esc(r.note)}" placeholder="備註" enterkeyhint="next">
           <button class="b r" data-xdel="${b.k}.${i}" title="刪除">×</button></div>`).join('')}
         <button class="b g" data-xadd="${b.k}">＋ 新增動作</button></div>`; }).join('')}
-      <button class="b g" id="copyPrev" ${idx<=0?'disabled':''}>複製上一堂計畫</button>
+      <datalist id="exList">${exerciseNames().map(n=>`<option value="${esc(n)}">`).join('')}</datalist>
+      ${srcs.length?`<select id="copyFrom"><option value="">複製計畫自…</option>${srcs.map(d=>`<option value="${d}">第${dates.indexOf(d)+1}堂 ${md(d)}（${countRows(peek(d))} 個動作）</option>`).join('')}</select>`:''}
     </div>
     <div>
       <div class="card">
         <h2>本堂強度</h2>
         <div class="row">
-          <label class="muted">RPE（0–10，下課當下問大家的平均感受）<input type="number" id="sRpe" min="0" max="10" step="0.5" value="${s.rpe??''}" style="width:72px"></label>
-          <label class="muted">分鐘 <input type="number" id="sMin" value="${s.minutes??90}" style="width:72px"></label>
+          <label class="muted">RPE（0–10，下課當下問大家的平均感受）<input type="number" id="sRpe" min="0" max="10" step="0.5" inputmode="decimal" value="${s.rpe??''}" style="width:72px"></label>
+          <label class="muted">分鐘 <input type="number" id="sMin" inputmode="numeric" value="${s.minutes??90}" style="width:72px"></label>
         </div>
         <p class="muted" id="attSum" style="margin-bottom:0"></p>
       </div>
@@ -535,24 +572,42 @@ function renderSession(){
     </div>
   </div>`;
   const T=$('tab-session');
-  $('pickS').onchange=e=>{ curDate=e.target.value; renderSession(); };
-  $('prevS').onclick=()=>{ curDate=dates[idx-1]; renderSession(); };
-  $('nextS').onclick=()=>{ curDate=dates[idx+1]; renderSession(); };
-  $('sStatus').onchange=e=>{ s.status=e.target.value; save(); renderSession(); renderHeader(); };
+  $('pickS').onchange=e=>{ curDate=e.target.value; renderSession(); window.scrollTo(0,0); };
+  $('prevS').onclick=()=>{ curDate=dates[idx-1]; renderSession(); window.scrollTo(0,0); };
+  $('nextS').onclick=()=>{ curDate=dates[idx+1]; renderSession(); window.scrollTo(0,0); };
+  $('sStatus').onchange=e=>{ s.status=e.target.value; save(); renderSession(); };
   $('sReason').oninput=e=>{ s.cancelReason=e.target.value; save(); };
   $('sNotes').oninput=e=>{ s.notes=e.target.value; save(); };
-  T.querySelectorAll('[data-p]').forEach(i=>i.oninput=()=>{ const [k,n,f]=i.dataset.p.split('.'); s.plan[k][+n][f]=i.value; save(); });
+  T.querySelectorAll('[data-p]').forEach(i=>{
+    i.oninput=()=>{ const [k,n,f]=i.dataset.p.split('.'); s.plan[k][+n][f]=i.value; save(); };
+    i.onkeydown=e=>{
+      if(e.key!=='Enter') return; e.preventDefault();
+      const nx=i.nextElementSibling;
+      if(nx&&nx.tagName==='INPUT'){ nx.focus(); return; }
+      const [k,n]=i.dataset.p.split('.');
+      const nr=T.querySelector(`[data-p="${k}.${+n+1}.name"]`);
+      if(nr) nr.focus(); else T.querySelector(`[data-xadd="${k}"]`).click();
+    };
+  });
   T.querySelectorAll('[data-xadd]').forEach(b=>b.onclick=()=>{
     const k=b.dataset.xadd; s.plan[k].push({name:'',sets:'',reps:'',note:''}); save(); renderSession();
     const l=[...$('tab-session').querySelectorAll('[data-p^="'+k+'."][data-p$=".name"]')].pop(); if(l) l.focus();
   });
-  T.querySelectorAll('[data-xdel]').forEach(b=>b.onclick=()=>{ const [k,n]=b.dataset.xdel.split('.'); s.plan[k].splice(+n,1); save(); renderSession(); });
-  $('copyPrev').onclick=()=>{
-    const p=sess(dates[idx-1]); if(!confirm('用 '+md(dates[idx-1])+' 的計畫覆蓋本堂？')) return;
-    s.plan=JSON.parse(JSON.stringify(p.plan)); save(); renderSession();
+  T.querySelectorAll('[data-xdel]').forEach(b=>b.onclick=()=>{
+    const [k,n]=b.dataset.xdel.split('.'); const row=s.plan[k].splice(+n,1)[0]; save(); renderSession();
+    if(row&&(row.name||row.sets||row.reps||row.note)) toast('已刪除',{label:'復原',fn:()=>{ s.plan[k].splice(+n,0,row); save(); renderSession(); }});
+  });
+  if($('copyFrom')) $('copyFrom').onchange=e=>{
+    const f=e.target.value; if(!f) return;
+    if(countRows(s)>0&&!confirm('用 '+md(f)+' 的計畫覆蓋本堂已寫的內容？')){ e.target.value=''; return; }
+    s.plan=JSON.parse(JSON.stringify(sess(f).plan)); save(); renderSession(); toast('已複製 '+md(f)+' 的計畫');
   };
   const sumUp=()=>{ $('attSum').textContent=(s.rpe===''||s.rpe==null)?'':'sRPE（RPE × 分鐘）＝ '+Math.round(s.rpe*(s.minutes??90)); };
-  $('sRpe').oninput=e=>{ s.rpe=e.target.value===''?'':+e.target.value; save(); sumUp(); };
+  $('sRpe').oninput=e=>{
+    s.rpe=e.target.value===''?'':+e.target.value;
+    if(s.rpe!==''&&s.status==='planned'){ s.status='done'; $('sStatus').value='done'; }
+    save(); sumUp();
+  };
   $('sMin').oninput=e=>{ s.minutes=+e.target.value||0; save(); sumUp(); };
   sumUp();
 }
@@ -607,7 +662,7 @@ function renderSettings(){
   </div>
   <div class="card"><h2>手機與電腦同步</h2>
     <p class="muted">資料存到你的私人 GitHub 資料庫，手機和電腦開同一個網頁、貼上同一把金鑰就會同步。金鑰只存在這台裝置。<br>
-    狀態：<b id="syncState">${SY.token?'已設定':'未設定'}</b></p>
+    狀態：<b id="syncState">${syLast||(SY.token?'已設定':'未設定')}</b></p>
     <label class="f">資料庫（帳號/名稱）</label>
     <input id="syRepo" value="${esc(SY.repo)}" style="width:100%">
     <label class="f">金鑰</label>
@@ -619,13 +674,14 @@ function renderSettings(){
     </div>
   </div>
   <div class="card"><h2>備份</h2>
-    <p class="muted">資料自動存在這台電腦的瀏覽器。建議再設定「自動存到資料夾」，每次修改都會寫一份 中山國中_autosave.json 到你選的資料夾。<br>
-    資料夾自動儲存：<b id="fsState">檢查中…</b></p>
+    ${window.showDirectoryPicker?`<p class="muted">電腦版 Chrome 可設定「自動存到資料夾」，每次修改都會多寫一份 中山國中_autosave.json。<br>資料夾自動儲存：<b id="fsState">檢查中…</b></p>`:'<p class="muted">資料已同步到雲端；也可以手動匯出一份備份。</p>'}
     <div class="row">
-      <button class="b" id="pickDir">設定自動儲存資料夾</button>
+      ${window.showDirectoryPicker?'<button class="b" id="pickDir">設定自動儲存資料夾</button>':''}
       <button class="b g" id="exp">匯出備份 JSON</button>
       <label class="b g" style="display:inline-block">匯入備份<input type="file" id="imp" accept=".json" class="hide"></label>
+      ${hasPrev()?'<button class="b g" id="restorePrev">還原被覆蓋前的資料</button>':''}
     </div>
+    <p class="muted" style="margin-bottom:0">版本 ${APP_VER}</p>
   </div>`;
   const bind=(id,k,re)=>$(id).onchange=e=>{ s[k]=e.target.type==='checkbox'?e.target.checked:e.target.value; save(); renderHeader(); if(re) renderSettings(); };
   bind('cStart','start'); bind('cEnd','end'); bind('cGs','gameStart'); bind('cGe','gameEnd'); bind('cHost','gameHost');
@@ -640,14 +696,21 @@ function renderSettings(){
   };
   $('imp').onchange=async e=>{
     const f=e.target.files[0]; if(!f) return;
-    try{ const d=JSON.parse(await f.text()); if(!d.settings||!d.sessions) throw new Error('格式不符');
-      if(!confirm('匯入會覆蓋目前所有資料，確定？')) return; D=d; save(); render(); toast('已匯入'); }
+    try{ const d=JSON.parse(await f.text()); if(!validData(d)) throw new Error('格式不符');
+      if(!confirm('匯入會覆蓋目前所有資料（可在設定還原），確定？')) return; stashPrev(); D=d; if((D.tplVer||1)<7) upgradeData(); save(); curDate=null; render(); toast('已匯入'); }
     catch(err){ alert('匯入失敗：'+err.message); }
   };
-  $('pickDir').onclick=pickDir;
+  if($('pickDir')) $('pickDir').onclick=pickDir;
+  if($('restorePrev')) $('restorePrev').onclick=()=>{
+    try{ const p=JSON.parse(localStorage.getItem('zsjh_sc_prev')); if(!p||!validData(p.d)) throw 0;
+      if(!confirm('還原成 '+new Date(p.at).toLocaleString('zh-TW')+' 被覆蓋前的資料？目前的資料會被取代。')) return;
+      D=p.d; save(); curDate=null; render(); toast('已還原'); }catch(e){ alert('沒有可還原的資料'); }
+  };
   $('syOn').onclick=()=>{
     const t=$('syToken').value.trim(); if(t) SY.token=t;
-    SY.repo=$('syRepo').value.trim()||SY.repo; SY.sha=''; syMeta();
+    const rp=$('syRepo').value.trim()||SY.repo;
+    if(!/^[\w.-]+\/[\w.-]+$/.test(rp)){ toast('資料庫要寫成 帳號/名稱'); return; }
+    SY.repo=rp; SY.sha=''; syMeta();
     if(!SY.token){ toast('請先貼上金鑰'); return; }
     syncNow(); renderSettings();
   };
@@ -716,6 +779,7 @@ function render(){
   ({overview:renderOverview,session:renderSession})[curTab]();
 }
 load(); render();
+$('syncSt').onclick=()=>{ if(!SY.token) return; show('more'); const d=document.querySelectorAll('#tab-more details')[3]; d.open=true; d.scrollIntoView(); };
 if(SY.token){ syShow(SY.dirty?'待上傳…':''); syncNow(); }
 if('serviceWorker' in navigator && location.protocol==='https:') navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
