@@ -41,6 +41,7 @@ button.b.o{background:var(--orange)}
 button.b.g{background:#fff;color:var(--navy);border:1px solid var(--navy)}
 button.b.r{background:#fff;color:var(--warn);border:1px solid var(--warn)}
 button.b:disabled{opacity:.4;cursor:default}
+label.b{display:inline-block;background:#fff;color:var(--navy);border:1px solid var(--navy);border-radius:6px;padding:7px 14px;cursor:pointer;font-size:13px}
 table{border-collapse:collapse;width:100%}
 th,td{border-bottom:1px solid var(--line);padding:7px 6px;text-align:left;vertical-align:top}
 th{font-size:12px;color:var(--muted);font-weight:500;background:#faf6ee}
@@ -80,7 +81,7 @@ button,input,select,textarea,summary{touch-action:manipulation}
   body{font-size:15px}
   input,select,textarea{font-size:16px}
   header{padding:calc(12px + env(safe-area-inset-top,0px)) 14px 12px} main{padding:12px 12px calc(30px + env(safe-area-inset-bottom,0px))}
-  button.b{min-height:40px} input,select{min-height:40px}
+  button.b,label.b{min-height:40px} input,select{min-height:40px}
   .card{padding:12px}
   .ex{flex-wrap:wrap}
   .exn{flex:1 1 100%}
@@ -285,7 +286,7 @@ const REFS=[
   {t:'Foster et al. 2001｜sRPE（JSCR 15(1):109–115）',u:'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5673663/',a:'負荷監控方法'}
 ];
 
-const APP_VER='2026-11-02 v2';
+const APP_VER='2026-11-02 v3';
 function validData(d){ return !!(d&&typeof d==='object'&&d.settings&&d.sessions&&Array.isArray(d.phases)); }
 function hasContent(d){
   return Object.values((d&&d.sessions)||{}).some(x=>x.status==='done'||x.notes||(x.rpe!=null&&x.rpe!=='')||(x.plan&&Object.values(x.plan).some(v=>Array.isArray(v)?v.some(r=>r.name):String(v||'').trim())));
