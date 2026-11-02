@@ -294,7 +294,7 @@ const REFS=[
   {t:'Foster et al. 2001｜sRPE（JSCR 15(1):109–115）',u:'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5673663/',a:'負荷監控方法'}
 ];
 
-const APP_VER='2026-11-02 v4';
+const APP_VER='2026-11-02 v5';
 function validData(d){ return !!(d&&typeof d==='object'&&d.settings&&d.sessions&&Array.isArray(d.phases)); }
 function hasContent(d){
   return Object.values((d&&d.sessions)||{}).some(x=>x.status==='done'||x.notes||(x.rpe!=null&&x.rpe!=='')||(x.plan&&Object.values(x.plan).some(v=>Array.isArray(v)?v.some(r=>r.name):String(v||'').trim())));
@@ -790,7 +790,14 @@ function render(){
 load(); render();
 $('syncSt').onclick=()=>{ if(!SY.token) return; show('more'); const d=document.querySelectorAll('#tab-more details')[3]; d.open=true; d.scrollIntoView(); };
 if(SY.token){ syShow(SY.dirty?'待上傳…':''); syncNow(); }
-if('serviceWorker' in navigator && location.protocol==='https:') navigator.serviceWorker.register('sw.js').catch(()=>{});
+if('serviceWorker' in navigator && location.protocol==='https:'){
+  const hadCtl=!!navigator.serviceWorker.controller; let reloaded=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{ if(hadCtl&&!reloaded){ reloaded=true; location.reload(); } });
+  navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{
+    reg.update();
+    document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') reg.update(); });
+  }).catch(()=>{});
+}
 </script>
 </body>
 </html>
