@@ -81,6 +81,12 @@ button,input,select,textarea,summary{touch-action:manipulation}
   body{font-size:15px}
   input,select,textarea{font-size:16px}
   header{padding:calc(12px + env(safe-area-inset-top,0px)) 14px 12px} main{padding:12px 12px calc(30px + env(safe-area-inset-bottom,0px))}
+  .ptab tr:first-child{display:none}
+  .ptab,.ptab tbody{display:block}
+  .ptab tr{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 0;border-bottom:1px solid var(--line)}
+  .ptab td{display:block;border:0;padding:0}
+  .ptab td:nth-child(1),.ptab td:nth-child(5){grid-column:1/-1}
+  .ptab input,.ptab textarea{width:100%!important}
   button.b,label.b{min-height:40px} input,select{min-height:40px}
   .card{padding:12px}
   .ex{flex-wrap:wrap}
@@ -93,6 +99,8 @@ button,input,select,textarea,summary{touch-action:manipulation}
 details.card>summary{font-size:15px}
 details.card[open]>summary{margin-bottom:10px}
 details.card .card{border:0;padding:0;background:none;margin:0 0 8px}
+details.card .card+.card{border-top:1px solid var(--line);padding-top:14px;margin-top:16px}
+body::before{content:'';position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top,0px);background:var(--navy);z-index:50}
 @media print{header,nav,.noprint,#tab-more>details:not(#dWarm){display:none!important} body{background:#fff} main{padding:0} .card{border:0}}
 </style>
 </head>
@@ -286,7 +294,7 @@ const REFS=[
   {t:'Foster et al. 2001｜sRPE（JSCR 15(1):109–115）',u:'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5673663/',a:'負荷監控方法'}
 ];
 
-const APP_VER='2026-11-02 v3';
+const APP_VER='2026-11-02 v4';
 function validData(d){ return !!(d&&typeof d==='object'&&d.settings&&d.sessions&&Array.isArray(d.phases)); }
 function hasContent(d){
   return Object.values((d&&d.sessions)||{}).some(x=>x.status==='done'||x.notes||(x.rpe!=null&&x.rpe!=='')||(x.plan&&Object.values(x.plan).some(v=>Array.isArray(v)?v.some(r=>r.name):String(v||'').trim())));
@@ -649,7 +657,7 @@ function renderSettings(){
     </div>
   </div>
   <div class="card"><h2>週期階段</h2>
-    <table><tr><th>名稱</th><th>開始</th><th>結束</th><th>顏色</th><th>目標</th><th></th></tr>
+    <table class="ptab"><tr><th>名稱</th><th>開始</th><th>結束</th><th>顏色</th><th>目標</th><th></th></tr>
     ${D.phases.map((p,i)=>`<tr>
       <td><input data-p="${i}" data-f="name" value="${esc(p.name)}" style="width:110px"></td>
       <td><input type="date" data-p="${i}" data-f="start" value="${p.start}"></td>
