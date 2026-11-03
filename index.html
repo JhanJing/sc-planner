@@ -129,7 +129,7 @@ label.f{display:block;font-size:13px;color:var(--ink2);margin:12px 0 4px}
 
 /* 動作列 */
 .ex2-bot{display:flex;gap:8px;margin-top:8px}
-.ex3-sum{display:flex;align-items:center;gap:10px;width:100%;min-height:60px;padding:10px 16px 10px 20px;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.ex3-sum{display:flex;align-items:center;gap:8px;width:100%;min-height:60px;padding:10px 16px 10px 8px;color:inherit;font:inherit;text-align:left;cursor:pointer}
 .ex3-sum:active{background:var(--fill)}
 .ex3-main{flex:1;min-width:0;display:flex;flex-direction:column}
 .ex3-name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -137,6 +137,11 @@ label.f{display:block;font-size:13px;color:var(--ink2);margin:12px 0 4px}
 .ex3-note{font-size:13px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ex3-dose{color:var(--ink2);font-variant-numeric:tabular-nums;white-space:nowrap}
 .ex3 .chev{transition:transform .2s}
+.ex3-grip{flex:none;width:36px;height:44px;margin:-6px 0;display:flex;align-items:center;justify-content:center;color:var(--ink3);touch-action:none;cursor:grab;-webkit-user-select:none;user-select:none}
+.ex3-grip svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.ex3.open .ex3-grip{display:none}
+.ex3{transition:transform .16s ease}
+.ex3.dragging{transition:none;position:relative;z-index:5;background:var(--card);box-shadow:0 10px 30px rgba(0,0,0,.28);border-radius:16px}
 .ex3.open .ex3-note{display:none}
 .ex3.open .chev{transform:rotate(90deg)}
 .ex3-edit{display:none;padding:2px 14px 16px 14px}
@@ -410,7 +415,7 @@ const REFS=[
   {t:'Foster et al. 2001｜sRPE（JSCR 15(1):109–115）',u:'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5673663/',a:'負荷監控方法'}
 ];
 
-const APP_VER='2026-11-03 v10';
+const APP_VER='2026-11-03 v11';
 function validData(d){ return !!(d&&typeof d==='object'&&d.settings&&d.sessions&&Array.isArray(d.phases)); }
 function hasContent(d){
   return Object.values((d&&d.sessions)||{}).some(x=>x.status==='done'||x.notes||(x.rpe!=null&&x.rpe!=='')||(x.plan&&Object.values(x.plan).some(v=>Array.isArray(v)?v.some(r=>r.name):String(v||'').trim())));
@@ -716,7 +721,7 @@ function renderSession(){
     <details><summary class="muted">每堂共通原則</summary><ul>${COMMON_RULES.map(r=>`<li>${esc(r)}</li>`).join('')}</ul></details></div></details>`:''}
   ${BLOCKS.map(b=>{ const hint=guide&&guide.blocks[b.k]; const tt=b.t.split('（'); return `<div class="sec-h"><span>${tt[0]}</span><span class="val">${tt[1]?tt[1].replace('）',''):''}</span></div>
   <div class="grp">${s.plan[b.k].map((r,i,arr)=>{ const key=b.k+'.'+i; return `<div class="ex3 ${openEx===key?'open':''}" data-key="${key}">
-      <div class="ex3-sum" role="button" data-xopen="${key}"><span class="ex3-main"><span class="ex3-name ${r.name?'':'empty'}">${esc(r.name||'未命名動作')}</span><span class="ex3-note ${r.note?'':'hide'}">${esc(r.note||'')}</span><input class="exn" list="exList" data-p="${key}.name" value="${esc(r.name)}" placeholder="動作名稱" enterkeyhint="next"></span><span class="ex3-dose">${esc(doseText(r)||'—')}</span><span class="chev">›</span></div>
+      <div class="ex3-sum" role="button" data-xopen="${key}"><span class="ex3-grip" aria-label="按住拖曳排序"><svg viewBox="0 0 24 24"><path d="M5 8h14M5 12h14M5 16h14"/></svg></span><span class="ex3-main"><span class="ex3-name ${r.name?'':'empty'}">${esc(r.name||'未命名動作')}</span><span class="ex3-note ${r.note?'':'hide'}">${esc(r.note||'')}</span><input class="exn" list="exList" data-p="${key}.name" value="${esc(r.name)}" placeholder="動作名稱" enterkeyhint="next"></span><span class="ex3-dose">${esc(doseText(r)||'—')}</span><span class="chev">›</span></div>
       <div class="ex3-edit">
         <div class="ex2-bot">
           <input class="exs" data-p="${key}.sets" value="${esc(r.sets)}" placeholder="組數" inputmode="numeric" enterkeyhint="next">
@@ -724,8 +729,6 @@ function renderSession(){
           <input class="exo" data-p="${key}.note" value="${esc(r.note)}" placeholder="備註" enterkeyhint="next">
         </div>
         <div class="ex3-act">
-          <button class="b g" data-xmv="${key}.-1" ${i===0?'disabled':''}>↑ 上移</button>
-          <button class="b g" data-xmv="${key}.1" ${i===arr.length-1?'disabled':''}>↓ 下移</button>
           <button class="b r" data-xdel="${key}">刪除</button>
         </div>
       </div></div>`; }).join('')}
@@ -761,7 +764,7 @@ function renderSession(){
     if(sel){ const el=row.querySelector(sel); if(el) el.focus(); }
   };
   T.querySelectorAll('[data-xopen]').forEach(b=>b.onclick=e=>{
-    if(e.target.closest('input')) return;
+    if(e.target.closest('input')||e.target.closest('.ex3-grip')) return;
     const key=b.dataset.xopen;
     if(openEx===key){ b.closest('.ex3').classList.remove('open'); openEx=null; } else openRow(key);
   });
@@ -779,11 +782,46 @@ function renderSession(){
     const k=b.dataset.xadd; s.plan[k].push({name:'',sets:'',reps:'',note:''}); openEx=k+'.'+(s.plan[k].length-1); save(); renderSession();
     const l=T.querySelector('.ex3[data-key="'+openEx+'"] .exn'); if(l) l.focus();
   });
-  T.querySelectorAll('[data-xmv]').forEach(b=>b.onclick=()=>{
-    const [k,n,d]=b.dataset.xmv.split('.'); const i=+n, j=i+(+d), a=s.plan[k];
-    if(j<0||j>=a.length) return;
-    [a[i],a[j]]=[a[j],a[i]]; openEx=k+'.'+j; save(); renderSession();
-    const nb=T.querySelector('.ex3[data-key="'+openEx+'"] [data-xmv="'+k+'.'+j+'.'+d+'"]'); if(nb&&!nb.disabled) nb.focus();
+  T.querySelectorAll('.ex3-grip').forEach(g=>{
+    g.addEventListener('click',e=>e.stopPropagation());
+    g.addEventListener('pointerdown',e=>{
+      e.preventDefault();
+      const row=g.closest('.ex3'), grp=row.parentElement, rows=[...grp.children].filter(c=>c.classList.contains('ex3'));
+      const [k,n]=row.dataset.key.split('.'), i=+n;
+      grp.querySelectorAll('.ex3.open').forEach(x=>x.classList.remove('open')); openEx=null;
+      const rects=rows.map(r=>({top:r.offsetTop,h:r.offsetHeight}));
+      const startY=e.clientY, startScroll=window.scrollY; let curY=startY, newIdx=i, raf=0;
+      try{ g.setPointerCapture(e.pointerId); }catch(_){}
+      row.classList.add('dragging');
+      const minD=rects[0].top-rects[i].top, maxD=rects[rects.length-1].top-rects[i].top;
+      const apply=()=>{
+        const dy=Math.max(minD,Math.min(maxD,(curY-startY)+(window.scrollY-startScroll)));
+        row.style.transform='translateY('+dy+'px)';
+        const c=rects[i].top+rects[i].h/2+dy; let idx=0;
+        rows.forEach((r,j)=>{ if(j!==i&&rects[j].top+rects[j].h/2<c) idx++; });
+        newIdx=idx;
+        rows.forEach((r,j)=>{
+          if(j===i) return; let t=0;
+          if(newIdx>i&&j>i&&j<=newIdx) t=-rects[i].h;
+          if(newIdx<i&&j<i&&j>=newIdx) t=rects[i].h;
+          r.style.transform=t?'translateY('+t+'px)':'';
+        });
+      };
+      const loop=()=>{ if(curY<110) window.scrollBy(0,-10); else if(curY>innerHeight-150) window.scrollBy(0,10); apply(); raf=requestAnimationFrame(loop); };
+      raf=requestAnimationFrame(loop);
+      const move=ev=>{ curY=ev.clientY; apply(); };
+      let cancelled=false;
+      const up=ev=>{ curY=ev.clientY; end(); };
+      const cancel=()=>{ cancelled=true; end(); };
+      const end=()=>{
+        cancelAnimationFrame(raf);
+        g.removeEventListener('pointermove',move); g.removeEventListener('pointerup',up); g.removeEventListener('pointercancel',cancel);
+        if(cancelled) newIdx=i; else apply();
+        if(newIdx!==i){ const a=s.plan[k], m=a.splice(i,1)[0]; a.splice(newIdx,0,m); save(); renderSession(); }
+        else{ row.classList.remove('dragging'); row.style.transform=''; rows.forEach(r=>{ r.style.transform=''; }); }
+      };
+      g.addEventListener('pointermove',move); g.addEventListener('pointerup',up); g.addEventListener('pointercancel',cancel);
+    });
   });
   T.querySelectorAll('[data-xdel]').forEach(b=>b.onclick=()=>{
     const [k,n]=b.dataset.xdel.split('.'); const row=s.plan[k].splice(+n,1)[0]; openEx=null; save(); renderSession();
