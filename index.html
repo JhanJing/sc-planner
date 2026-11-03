@@ -129,7 +129,7 @@ label.f{display:block;font-size:13px;color:var(--ink2);margin:12px 0 4px}
 
 /* 動作列 */
 .ex2-bot{display:flex;gap:8px;margin-top:8px}
-.ex3-sum{display:flex;align-items:center;gap:10px;width:100%;min-height:60px;padding:10px 16px 10px 20px;border:0;background:none;color:inherit;font:inherit;text-align:left}
+.ex3-sum{display:flex;align-items:center;gap:10px;width:100%;min-height:60px;padding:10px 16px 10px 20px;color:inherit;font:inherit;text-align:left;cursor:pointer}
 .ex3-sum:active{background:var(--fill)}
 .ex3-main{flex:1;min-width:0;display:flex;flex-direction:column}
 .ex3-name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -139,9 +139,14 @@ label.f{display:block;font-size:13px;color:var(--ink2);margin:12px 0 4px}
 .ex3 .chev{transition:transform .2s}
 .ex3.open .ex3-note{display:none}
 .ex3.open .chev{transform:rotate(90deg)}
-.ex3-edit{display:none;padding:2px 14px 16px 20px}
+.ex3-edit{display:none;padding:2px 14px 16px 14px}
 .ex3.open .ex3-edit{display:block;animation:pgin .18s ease}
-.ex3-edit .exn{width:100%;font-weight:600}
+.ex3-main .exn{display:none;width:100%;font-weight:600}
+.ex3.open .ex3-main .exn{display:block}
+.ex3.open .ex3-name,.ex3.open .ex3-dose{display:none}
+.ex3.open .ex3-sum{padding:10px 16px 6px 14px}
+.ex3.open .ex3-sum:active{background:none}
+.ex3-edit .ex2-bot{margin-top:0}
 .ex3-act{display:flex;gap:8px;margin-top:12px}
 .ex3-act .b{min-height:40px;padding:0 14px;font-size:15px}
 .ex3-act .b.r{margin-left:auto}
@@ -405,7 +410,7 @@ const REFS=[
   {t:'Foster et al. 2001｜sRPE（JSCR 15(1):109–115）',u:'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5673663/',a:'負荷監控方法'}
 ];
 
-const APP_VER='2026-11-03 v9';
+const APP_VER='2026-11-03 v10';
 function validData(d){ return !!(d&&typeof d==='object'&&d.settings&&d.sessions&&Array.isArray(d.phases)); }
 function hasContent(d){
   return Object.values((d&&d.sessions)||{}).some(x=>x.status==='done'||x.notes||(x.rpe!=null&&x.rpe!=='')||(x.plan&&Object.values(x.plan).some(v=>Array.isArray(v)?v.some(r=>r.name):String(v||'').trim())));
@@ -711,9 +716,8 @@ function renderSession(){
     <details><summary class="muted">每堂共通原則</summary><ul>${COMMON_RULES.map(r=>`<li>${esc(r)}</li>`).join('')}</ul></details></div></details>`:''}
   ${BLOCKS.map(b=>{ const hint=guide&&guide.blocks[b.k]; const tt=b.t.split('（'); return `<div class="sec-h"><span>${tt[0]}</span><span class="val">${tt[1]?tt[1].replace('）',''):''}</span></div>
   <div class="grp">${s.plan[b.k].map((r,i,arr)=>{ const key=b.k+'.'+i; return `<div class="ex3 ${openEx===key?'open':''}" data-key="${key}">
-      <button class="ex3-sum" data-xopen="${key}"><span class="ex3-main"><span class="ex3-name ${r.name?'':'empty'}">${esc(r.name||'未命名動作')}</span><span class="ex3-note ${r.note?'':'hide'}">${esc(r.note||'')}</span></span><span class="ex3-dose">${esc(doseText(r)||'—')}</span><span class="chev">›</span></button>
+      <div class="ex3-sum" role="button" data-xopen="${key}"><span class="ex3-main"><span class="ex3-name ${r.name?'':'empty'}">${esc(r.name||'未命名動作')}</span><span class="ex3-note ${r.note?'':'hide'}">${esc(r.note||'')}</span><input class="exn" list="exList" data-p="${key}.name" value="${esc(r.name)}" placeholder="動作名稱" enterkeyhint="next"></span><span class="ex3-dose">${esc(doseText(r)||'—')}</span><span class="chev">›</span></div>
       <div class="ex3-edit">
-        <input class="exn" list="exList" data-p="${key}.name" value="${esc(r.name)}" placeholder="動作名稱" enterkeyhint="next">
         <div class="ex2-bot">
           <input class="exs" data-p="${key}.sets" value="${esc(r.sets)}" placeholder="組數" inputmode="numeric" enterkeyhint="next">
           <input class="exr" data-p="${key}.reps" value="${esc(r.reps)}" placeholder="次數" enterkeyhint="next">
@@ -756,7 +760,8 @@ function renderSession(){
     row.classList.add('open'); openEx=key;
     if(sel){ const el=row.querySelector(sel); if(el) el.focus(); }
   };
-  T.querySelectorAll('[data-xopen]').forEach(b=>b.onclick=()=>{
+  T.querySelectorAll('[data-xopen]').forEach(b=>b.onclick=e=>{
+    if(e.target.closest('input')) return;
     const key=b.dataset.xopen;
     if(openEx===key){ b.closest('.ex3').classList.remove('open'); openEx=null; } else openRow(key);
   });
