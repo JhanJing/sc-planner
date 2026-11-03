@@ -74,7 +74,7 @@ button,input,select,textarea,summary{touch-action:manipulation}
 .guide{background:#fbf3e6;border-radius:8px;padding:8px 12px;margin-bottom:8px;font-size:13px}
 .guide ul{margin:6px 0;padding-left:20px} .guide li{margin:3px 0;line-height:1.5}
 .ex{display:flex;gap:6px;margin:6px 0}
-.ex input{min-width:0}.exn{flex:3}.exs{width:56px}.exr{width:68px}.exo{flex:2}
+.ex input{min-width:0}.exh{display:flex;gap:4px;flex:3;min-width:0}.exh .exn{flex:1}.mv{flex:none;padding:4px 9px!important}.exn{flex:3}.exs{width:56px}.exr{width:68px}.exo{flex:2}
 .ex .b{padding:4px 10px}
 @media(max-width:760px){.grid2{grid-template-columns:1fr!important}}
 @media(max-width:600px){
@@ -90,7 +90,8 @@ button,input,select,textarea,summary{touch-action:manipulation}
   button.b,label.b{min-height:40px} input,select{min-height:40px}
   .card{padding:12px}
   .ex{flex-wrap:wrap}
-  .exn{flex:1 1 100%}
+  .exh{flex:1 1 100%}
+  .exn{flex:1 1 auto}
   .exs,.exr{flex:1 1 20%;width:auto}
   .exo{flex:2 1 30%}
   nav button{padding:12px 14px}
@@ -294,7 +295,7 @@ const REFS=[
   {t:'Foster et al. 2001｜sRPE（JSCR 15(1):109–115）',u:'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5673663/',a:'負荷監控方法'}
 ];
 
-const APP_VER='2026-11-02 v5';
+const APP_VER='2026-11-03 v6';
 function validData(d){ return !!(d&&typeof d==='object'&&d.settings&&d.sessions&&Array.isArray(d.phases)); }
 function hasContent(d){
   return Object.values((d&&d.sessions)||{}).some(x=>x.status==='done'||x.notes||(x.rpe!=null&&x.rpe!=='')||(x.plan&&Object.values(x.plan).some(v=>Array.isArray(v)?v.some(r=>r.name):String(v||'').trim())));
@@ -555,8 +556,9 @@ function renderSession(){
       ${guide?`<details class="guide"><summary>本階段安排原則</summary><p class="muted">${esc(ph.goal)}</p><ul>${guide.rules.map(r=>`<li>${esc(r)}</li>`).join('')}</ul>
         <details><summary class="muted">每堂共通原則</summary><ul>${COMMON_RULES.map(r=>`<li>${esc(r)}</li>`).join('')}</ul></details></details>`:''}
       ${BLOCKS.map(b=>{ const hint=guide&&guide.blocks[b.k]; return `<div class="blk"><div class="t">${b.t}</div>${hint?`<div class="muted">${esc(hint)}</div>`:''}
-        ${s.plan[b.k].map((r,i)=>`<div class="ex">
-          <input class="exn" list="exList" data-p="${b.k}.${i}.name" value="${esc(r.name)}" placeholder="動作名稱" enterkeyhint="next">
+        ${s.plan[b.k].map((r,i,arr)=>`<div class="ex">
+          <div class="exh"><input class="exn" list="exList" data-p="${b.k}.${i}.name" value="${esc(r.name)}" placeholder="動作名稱" enterkeyhint="next">
+            <button class="b g mv" data-xmv="${b.k}.${i}.-1" ${i===0?'disabled':''} title="上移">▲</button><button class="b g mv" data-xmv="${b.k}.${i}.1" ${i===arr.length-1?'disabled':''} title="下移">▼</button></div>
           <input class="exs" data-p="${b.k}.${i}.sets" value="${esc(r.sets)}" placeholder="組數" enterkeyhint="next">
           <input class="exr" data-p="${b.k}.${i}.reps" value="${esc(r.reps)}" placeholder="次數" enterkeyhint="next">
           <input class="exo" data-p="${b.k}.${i}.note" value="${esc(r.note)}" placeholder="備註" enterkeyhint="next">
@@ -591,8 +593,8 @@ function renderSession(){
     i.oninput=()=>{ const [k,n,f]=i.dataset.p.split('.'); s.plan[k][+n][f]=i.value; save(); };
     i.onkeydown=e=>{
       if(e.key!=='Enter') return; e.preventDefault();
-      const nx=i.nextElementSibling;
-      if(nx&&nx.tagName==='INPUT'){ nx.focus(); return; }
+      const ins=[...i.closest('.ex').querySelectorAll('input')], at=ins.indexOf(i);
+      if(at<ins.length-1){ ins[at+1].focus(); return; }
       const [k,n]=i.dataset.p.split('.');
       const nr=T.querySelector(`[data-p="${k}.${+n+1}.name"]`);
       if(nr) nr.focus(); else T.querySelector(`[data-xadd="${k}"]`).click();
@@ -601,6 +603,12 @@ function renderSession(){
   T.querySelectorAll('[data-xadd]').forEach(b=>b.onclick=()=>{
     const k=b.dataset.xadd; s.plan[k].push({name:'',sets:'',reps:'',note:''}); save(); renderSession();
     const l=[...$('tab-session').querySelectorAll('[data-p^="'+k+'."][data-p$=".name"]')].pop(); if(l) l.focus();
+  });
+  T.querySelectorAll('[data-xmv]').forEach(b=>b.onclick=()=>{
+    const [k,n,d]=b.dataset.xmv.split('.'); const i=+n, j=i+(+d), a=s.plan[k];
+    if(j<0||j>=a.length) return;
+    [a[i],a[j]]=[a[j],a[i]]; save(); renderSession();
+    const nb=$('tab-session').querySelector('[data-xmv="'+k+'.'+j+'.'+d+'"]'); if(nb&&!nb.disabled) nb.focus();
   });
   T.querySelectorAll('[data-xdel]').forEach(b=>b.onclick=()=>{
     const [k,n]=b.dataset.xdel.split('.'); const row=s.plan[k].splice(+n,1)[0]; save(); renderSession();
