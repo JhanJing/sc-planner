@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>中山國中 肌力與體能</title>
 <meta name="theme-color" content="#18243A">
+<meta name="color-scheme" content="light dark">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="肌力課">
@@ -13,122 +14,209 @@
 <link rel="apple-touch-icon" href="icon-180.png">
 <style>
 :root{
-  --navy:#18243A; --orange:#E2873B; --cream:#F3EEE4; --ink:#1d2433; --muted:#6b7280;
-  --line:#e2dccf; --card:#fffdf8; --ok:#2f8f5b; --warn:#c0392b; --gray:#9aa1ad;
+  color-scheme:light dark;
+  --navy:#18243A; --orange:#E2873B;
+  --bg:#f2f2f7; --card:#ffffff; --ink:#000000; --ink2:rgba(60,60,67,.62); --ink3:rgba(60,60,67,.3);
+  --sep:rgba(60,60,67,.2); --fill:rgba(118,118,128,.12); --segOn:#ffffff;
+  --accent:#C4621B; --btn:#18243A; --btnInk:#ffffff; --warn:#d92d20; --gray:#8e8e93;
+  --bar:rgba(249,249,249,.88);
+  --safeT:env(safe-area-inset-top,0px); --safeB:env(safe-area-inset-bottom,0px);
 }
-*{box-sizing:border-box}
-body{margin:0;font-family:"PingFang TC","Noto Sans TC",sans-serif;background:var(--cream);color:var(--ink);font-size:14px}
-header{background:var(--navy);color:var(--cream);padding:calc(14px + env(safe-area-inset-top,0px)) 20px 14px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-header h1{font-size:18px;margin:0;font-weight:600}
-header .sub{font-size:12px;opacity:.75}
-header .cd{margin-left:auto;text-align:right}
-header .cd b{color:var(--orange);font-size:22px}
-nav{display:flex;gap:4px;padding:0 16px;background:var(--navy);border-bottom:3px solid var(--orange);overflow-x:auto}
-nav button{background:none;border:0;color:#c9cfdb;padding:10px 14px;font-size:14px;cursor:pointer;white-space:nowrap;font-family:inherit}
-nav button.on{color:#fff;border-bottom:3px solid var(--orange);margin-bottom:-3px;font-weight:600}
-main{padding:18px 18px calc(30px + env(safe-area-inset-bottom,0px));max-width:1200px;margin:0 auto}
-.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:14px}
-.card h2{font-size:16px;margin:0 0 10px;color:var(--navy)}
-.card h3{font-size:14px;margin:14px 0 6px;color:var(--navy)}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#000000; --card:#1c1c1e; --ink:#ffffff; --ink2:rgba(235,235,245,.6); --ink3:rgba(235,235,245,.3);
+  --sep:rgba(84,84,88,.65); --fill:rgba(118,118,128,.24); --segOn:#636366;
+  --accent:#F0A060; --btn:#E2873B; --btnInk:#1c1c1e; --warn:#ff6961; --bar:rgba(28,28,30,.88);
+}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:var(--bg);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);min-height:100dvh;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang TC","Noto Sans TC","Helvetica Neue",sans-serif;
+  font-size:17px;line-height:1.35;-webkit-font-smoothing:antialiased;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+input,textarea,select{-webkit-user-select:text;user-select:text}
+button,input,select,textarea,summary{touch-action:manipulation}
+.hide{display:none!important}
+a{color:var(--accent)}
+
+/* 標題列與頁籤列 */
+.nb{position:sticky;top:0;z-index:20;background:var(--navy);color:#fff;padding-top:var(--safeT)}
+.nb-in{max-width:680px;margin:0 auto;height:44px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 16px}
+.nb-app{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nb-sync{background:none;border:0;color:rgba(255,255,255,.85);font:inherit;font-size:13px;padding:0;min-height:44px;white-space:nowrap}
+.nb-sync:empty{display:none}
+.nb-back{background:none;border:0;color:#fff;font:inherit;font-size:17px;display:flex;align-items:center;gap:2px;padding:0 8px 0 0;min-height:44px}
+.nb-back svg{width:12px;height:20px;stroke:currentColor;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.tb{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--bar);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);
+  border-top:.5px solid var(--sep);padding-bottom:var(--safeB)}
+.tb-in{max-width:680px;margin:0 auto;display:flex}
+.tb button{flex:1;border:0;background:none;color:var(--gray);display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:6px 0 4px;min-height:49px;font:inherit;font-size:10px;font-weight:500}
+.tb button.on{color:var(--accent)}
+.tb svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+main{max-width:680px;margin:0 auto;padding:0 0 calc(49px + var(--safeB) + 32px)}
+@keyframes pgin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes push{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
+.pg{animation:pgin .22s ease}
+.push{animation:push .26s ease}
+
+/* 大標題 */
+.lt-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:14px 16px 6px}
+h1.lt{font-size:34px;font-weight:700;letter-spacing:.3px;line-height:1.15;margin:0}
+.lt-sub{font-size:15px;color:var(--ink2);margin-top:2px}
+.pn{display:flex;gap:10px;flex:none}
+.ib2{width:44px;height:44px;border-radius:22px;border:0;background:var(--fill);color:var(--accent);font:inherit;font-size:28px;line-height:1;padding:0 0 3px}
+.ib2:disabled{opacity:.3}
+
+/* 分組清單 */
+.sec-h{font-size:13px;color:var(--ink2);margin:22px 32px 6px}
+.sec-f{font-size:13px;color:var(--ink2);margin:6px 32px 0;line-height:1.45}
+.grp{background:var(--card);border-radius:12px;margin:0 16px;overflow:hidden}
+.grp>*{position:relative}
+.grp>*+*::before{content:'';position:absolute;top:0;left:16px;right:0;height:.5px;background:var(--sep)}
+.row2{display:flex;align-items:center;gap:10px;min-height:44px;padding:8px 16px;width:100%;border:0;background:none;color:inherit;font:inherit;text-align:left}
+.row2.pad{padding:10px 12px}
+.row2.col{display:block}
+.tap{cursor:pointer}
+.tap:active{background:var(--fill)}
+.lbl{flex:1;min-width:0}
+.val{color:var(--ink2)}
+.chev{color:var(--ink3);font-size:22px;line-height:1;flex:none}
+.ico{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex:none}
+.ico svg{width:19px;height:19px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+details[open]>summary .chev{transform:rotate(90deg)}
+summary{list-style:none;cursor:pointer}
+summary::-webkit-details-marker{display:none}
+.gbody{padding:4px 16px 14px;font-size:15px;line-height:1.5}
+.gbody ul{margin:6px 0;padding-left:20px}
+.gbody li{margin:4px 0}
+.row2 select{background:none;border-radius:0;padding:0 18px 0 0;min-height:0;text-align:right;text-align-last:right;color:var(--accent);flex:1;min-width:0}
+.row2 input.num{width:88px;text-align:right}
+.row2 input.tx{background:none;text-align:right;padding:0;flex:1.6;min-width:0;border-radius:0}
+.row2 input[type=date]{flex:none}
+input[type=checkbox].sw{-webkit-appearance:none;appearance:none;width:51px;height:31px;min-height:0;border-radius:16px;background:rgba(120,120,128,.32);position:relative;flex:none;padding:0;transition:background .2s;margin:0}
+input[type=checkbox].sw::after{content:'';position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.3);transition:transform .2s}
+input[type=checkbox].sw:checked{background:#34c759}
+input[type=checkbox].sw:checked::after{transform:translateX(20px)}
+
+/* 輸入欄位 */
+input,select,textarea{font:inherit;font-size:17px;color:var(--ink);background:var(--fill);border:0;border-radius:8px;padding:9px 12px;min-height:44px;-webkit-appearance:none;appearance:none;max-width:100%}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='16' viewBox='0 0 10 16'%3E%3Cpath d='M2 6l3-3 3 3M2 10l3 3 3-3' fill='none' stroke='%238e8e93' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+.row2 select{background-position:right 0 center;padding-right:16px}
+input[type=checkbox]{width:22px;height:22px;min-height:0;-webkit-appearance:auto;appearance:auto}
+input[type=color]{padding:2px;width:48px}
+::placeholder{color:var(--ink3)}
+textarea{width:100%;min-height:80px;resize:vertical;line-height:1.45}
+.grp>textarea{background:none;border-radius:0;padding:12px 16px}
+label.f{display:block;font-size:13px;color:var(--ink2);margin:12px 0 4px}
+
+/* 分段控制 */
+.seg{display:flex;width:100%;background:var(--fill);border-radius:9px;padding:2px;gap:2px}
+.seg button{flex:1;border:0;background:none;color:var(--ink);font:inherit;font-size:14px;padding:8px 2px;min-height:34px;border-radius:7px}
+.seg button.on{background:var(--segOn);box-shadow:0 1px 3px rgba(0,0,0,.18);font-weight:600}
+
+/* 動作列 */
+.ex2{padding:8px 12px 10px 16px}
+.ex2-top{display:flex;align-items:center;gap:8px}
+.ex2 .exn{flex:1;min-width:0;background:none;border-radius:0;padding:6px 0;min-height:36px;font-weight:600}
+.ex2-bot{display:flex;gap:8px;margin-top:4px}
+.ex2-bot input{min-width:0;font-size:16px;min-height:40px;padding:8px 10px}
+.exs,.exr{flex:0 0 23%}
+.exo{flex:1}
+.ib{position:relative;flex:none;width:30px;height:30px;border-radius:15px;border:0;background:var(--fill);color:var(--accent);display:flex;align-items:center;justify-content:center;padding:0}
+.ib::after{content:'';position:absolute;inset:-7px}
+.ib:disabled{opacity:.3}
+.ib.del{color:var(--warn)}
+.ib svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.addrow{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;color:var(--accent);font:inherit;font-weight:500;min-height:44px;padding:8px 16px;text-align:left}
+.addrow:active{background:var(--fill)}
+.plus{width:24px;height:24px;border-radius:12px;background:var(--accent);color:var(--card);display:flex;align-items:center;justify-content:center;font-size:20px;line-height:1;padding-bottom:2px}
+
+/* 清單列（時程） */
+.lrow.next{background:rgba(226,135,59,.14)}
+.lrow.past .mid,.lrow.past .dcol{opacity:.6}
+.dcol{width:58px;flex:none;display:flex;flex-direction:column}
+.dcol b{font-size:17px}
+.dcol small,.mid small{font-size:12px;color:var(--ink2)}
+.mid{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start}
+.mid .pn2{display:flex;align-items:center;gap:6px}
+.dot{width:9px;height:9px;border-radius:5px;display:inline-block;flex:none}
+.tagn{font-size:11px;color:#fff;background:var(--accent);border-radius:4px;padding:0 5px;margin-top:2px;width:fit-content}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:13px;color:#fff;white-space:nowrap}
+.st-planned{background:var(--gray)} .st-done{background:#34a853} .st-cancelled{background:#d92d20} .st-tbc{background:#b58b00}
+.tag{display:inline-block;padding:1px 7px;border-radius:5px;font-size:12px;background:var(--accent);color:var(--card)}
+.phasebar{display:flex;height:30px;border-radius:8px;overflow:hidden;margin:2px 0 8px}
+.phasebar div{display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;overflow:hidden;white-space:nowrap;padding:0 4px}
+.legend{font-size:15px;line-height:1.8}
+
+/* 按鈕 */
+button.b,label.b{display:inline-flex;align-items:center;justify-content:center;background:var(--btn);color:var(--btnInk);border:0;border-radius:10px;padding:0 16px;min-height:44px;cursor:pointer;font:inherit;font-size:16px;font-weight:600}
+button.b.o{background:var(--orange);color:#1c1c1e}
+button.b.g,label.b.g{background:var(--fill);color:var(--accent)}
+button.b.r{background:var(--fill);color:var(--warn)}
+button.b:active,label.b:active{opacity:.6}
+button.b:disabled{opacity:.35}
+
+/* 詳細頁（更多）內的卡片、表格 */
+.card{background:var(--card);border-radius:12px;padding:16px;margin:16px 16px 0}
+.card h2{font-size:20px;font-weight:700;margin:0 0 10px}
+.card h3{font-size:16px;margin:14px 0 6px}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:760px){.grid2{grid-template-columns:1fr}}
-input,select,textarea{font-family:inherit;font-size:14px;padding:6px 8px;border:1px solid #cfc8b8;border-radius:6px;background:#fff;color:var(--ink)}
-textarea{width:100%;min-height:70px;resize:vertical;line-height:1.5}
-label.f{display:block;font-size:12px;color:var(--muted);margin:8px 0 3px}
-button.b{background:var(--navy);color:#fff;border:0;border-radius:6px;padding:7px 14px;cursor:pointer;font-family:inherit;font-size:13px}
-button.b.o{background:var(--orange)}
-button.b.g{background:#fff;color:var(--navy);border:1px solid var(--navy)}
-button.b.r{background:#fff;color:var(--warn);border:1px solid var(--warn)}
-button.b:disabled{opacity:.4;cursor:default}
-label.b{display:inline-block;background:#fff;color:var(--navy);border:1px solid var(--navy);border-radius:6px;padding:7px 14px;cursor:pointer;font-size:13px}
+@media(max-width:600px){.grid2{grid-template-columns:1fr}}
+.muted{color:var(--ink2);font-size:13px;line-height:1.5}
 table{border-collapse:collapse;width:100%}
-th,td{border-bottom:1px solid var(--line);padding:7px 6px;text-align:left;vertical-align:top}
-th{font-size:12px;color:var(--muted);font-weight:500;background:#faf6ee}
-tr.click{cursor:pointer}
-tr.click:hover td{background:#fbf3e6}
-tr.past td{color:#555}
-tr.next td{background:#fff3e3}
-.pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;color:#fff;white-space:nowrap}
-.st-planned{background:var(--gray)} .st-done{background:var(--ok)} .st-cancelled{background:var(--warn)} .st-tbc{background:#b58b00}
-.tag{display:inline-block;padding:1px 6px;border-radius:4px;font-size:11px;background:var(--orange);color:#fff;margin-left:4px}
-.phasebar{display:flex;height:34px;border-radius:6px;overflow:hidden;margin:6px 0 4px}
-.phasebar div{display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;overflow:hidden;white-space:nowrap;padding:0 4px}
-.muted{color:var(--muted);font-size:12px}
-.stat{flex:1;min-width:130px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px}
-.stat b{display:block;font-size:22px;color:var(--navy)}
-.att td input[type=number]{width:72px}
-.blk{border-left:4px solid var(--orange);padding-left:10px;margin:10px 0}
-.blk .t{font-weight:600;color:var(--navy);font-size:13px}
-.toast{position:fixed;bottom:calc(18px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:8px 16px;border-radius:8px;opacity:0;transition:.3s;pointer-events:none}
-.toast.show{opacity:1}
-.toast.act{pointer-events:auto}
-.tact{margin-left:12px;background:var(--orange);color:#fff;border:0;border-radius:6px;padding:6px 12px;font:inherit}
-button,input,select,textarea,summary{touch-action:manipulation}
-#syncSt.link{cursor:pointer;text-decoration:underline dotted}
-#copyFrom{margin-top:6px;max-width:100%}
-.up{color:var(--ok);font-weight:600} .down{color:var(--warn);font-weight:600}
-.hide{display:none}
-.chart{width:100%;height:180px}
+th,td{border-bottom:.5px solid var(--sep);padding:9px 6px;text-align:left;vertical-align:top;font-size:15px}
+th{font-size:13px;color:var(--ink2);font-weight:500}
+.blk{border-left:4px solid var(--orange);padding-left:10px;margin:12px 0}
+.blk .t{font-weight:600;font-size:15px;margin-bottom:6px}
 .wu li{margin:6px 0;line-height:1.5}
-.guide{background:#fbf3e6;border-radius:8px;padding:8px 12px;margin-bottom:8px;font-size:13px}
-.guide ul{margin:6px 0;padding-left:20px} .guide li{margin:3px 0;line-height:1.5}
-.ex{display:flex;gap:6px;margin:6px 0}
-.ex input{min-width:0}.exh{display:flex;gap:4px;flex:3;min-width:0}.exh .exn{flex:1}.mv{flex:none;padding:4px 9px!important}.exn{flex:3}.exs{width:56px}.exr{width:68px}.exo{flex:2}
-.ex .b{padding:4px 10px}
-@media(max-width:760px){.grid2{grid-template-columns:1fr!important}}
+.chart{width:100%;height:180px}
+.ptab input,.ptab textarea{font-size:16px}
 @media(max-width:600px){
-  body{font-size:15px}
-  input,select,textarea{font-size:16px}
-  header{padding:calc(12px + env(safe-area-inset-top,0px)) 14px 12px} main{padding:12px 12px calc(30px + env(safe-area-inset-bottom,0px))}
   .ptab tr:first-child{display:none}
   .ptab,.ptab tbody{display:block}
-  .ptab tr{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 0;border-bottom:1px solid var(--line)}
+  .ptab tr{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 0;border-bottom:.5px solid var(--sep)}
   .ptab td{display:block;border:0;padding:0}
   .ptab td:nth-child(1),.ptab td:nth-child(5){grid-column:1/-1}
   .ptab input,.ptab textarea{width:100%!important}
-  button.b,label.b{min-height:40px} input,select{min-height:40px}
-  .card{padding:12px}
-  .ex{flex-wrap:wrap}
-  .exh{flex:1 1 100%}
-  .exn{flex:1 1 auto}
-  .exs,.exr{flex:1 1 20%;width:auto}
-  .exo{flex:2 1 30%}
-  nav button{padding:12px 14px}
 }
-.guide summary,details.card>summary{cursor:pointer;font-weight:600;color:var(--navy)}
-details.card>summary{font-size:15px}
-details.card[open]>summary{margin-bottom:10px}
-details.card .card{border:0;padding:0;background:none;margin:0 0 8px}
-details.card .card+.card{border-top:1px solid var(--line);padding-top:14px;margin-top:16px}
-body::before{content:'';position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top,0px);background:var(--navy);z-index:50}
-@media print{header,nav,.noprint,#tab-more>details:not(#dWarm){display:none!important} body{background:#fff} main{padding:0} .card{border:0}}
+
+/* 提示 */
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(49px + var(--safeB) + 14px);z-index:40;max-width:calc(100% - 32px);
+  background:rgba(44,44,46,.94);color:#fff;padding:11px 16px;border-radius:14px;font-size:15px;opacity:0;transition:.25s;pointer-events:none;text-align:center}
+.toast.show{opacity:1}
+.toast.act{pointer-events:auto}
+.tact{margin-left:12px;background:var(--orange);color:#1c1c1e;border:0;border-radius:8px;padding:6px 12px;font:inherit;font-weight:600}
+.up{color:#34a853;font-weight:600} .down{color:var(--warn);font-weight:600}
+@media print{.nb,.tb,.noprint,#moreList,#moreHead{display:none!important} body{background:#fff;color:#000} main{padding:0} .card{margin:0 0 12px}}
 </style>
 </head>
 <body>
-<header>
-  <div>
-    <h1>中山國中 肌力與體能訓練</h1>
-    <div class="sub" id="hdrSub"></div>
-    <div class="sub" id="syncSt" style="margin-top:2px"></div>
-  </div>
-  <div class="cd" id="hdrCd"></div>
-</header>
-<nav id="nav">
-  <button data-tab="session" class="on">本堂課</button>
-  <button data-tab="overview">時程</button>
-  <button data-tab="more">更多</button>
-</nav>
+<header class="nb"><div class="nb-in">
+  <button class="nb-back hide" id="nbBack"><svg viewBox="0 0 12 20"><path d="M10 2L2 10l8 8"/></svg>更多</button>
+  <div class="nb-app" id="nbApp">中山國中 肌力與體能</div>
+  <button class="nb-sync" id="syncSt"></button>
+</div></header>
 <main>
   <section id="tab-session"></section>
   <section id="tab-overview" class="hide"></section>
   <section id="tab-more" class="hide">
-    <details class="card" id="dWarm"><summary>專項教練熱身（給羽球教練）</summary><div id="tab-warmup"></div></details>
-    <details class="card"><summary>訓練負荷</summary><div id="tab-load"></div></details>
-    <details class="card"><summary>訓練依據（文獻）</summary><div id="tab-refs"></div></details>
-    <details class="card"><summary>設定與備份</summary><div id="tab-settings"></div></details>
+    <div id="moreList"></div>
+    <div id="moreDetail" class="hide">
+      <div id="moreHead"></div>
+      <div id="tab-warmup" class="hide"></div>
+      <div id="tab-load" class="hide"></div>
+      <div id="tab-refs" class="hide"></div>
+      <div id="tab-settings" class="hide"></div>
+    </div>
   </section>
 </main>
+<nav class="tb" id="nav"><div class="tb-in">
+  <button data-tab="session" class="on"><svg viewBox="0 0 24 24"><rect x="5" y="4.5" width="14" height="17" rx="2.5"/><path d="M9 4.5h6v3H9z"/><path d="M8.7 13l2.2 2.2 4.4-4.6"/></svg><span>本堂課</span></button>
+  <button data-tab="overview"><svg viewBox="0 0 24 24"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10.5h16M8.5 3.5v4M15.5 3.5v4"/></svg><span>時程</span></button>
+  <button data-tab="more"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="8" cy="12" r=".8"/><circle cx="12" cy="12" r=".8"/><circle cx="16" cy="12" r=".8"/></svg><span>更多</span></button>
+</div></nav>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -295,7 +383,7 @@ const REFS=[
   {t:'Foster et al. 2001｜sRPE（JSCR 15(1):109–115）',u:'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5673663/',a:'負荷監控方法'}
 ];
 
-const APP_VER='2026-11-03 v6';
+const APP_VER='2026-11-03 v7';
 function validData(d){ return !!(d&&typeof d==='object'&&d.settings&&d.sessions&&Array.isArray(d.phases)); }
 function hasContent(d){
   return Object.values((d&&d.sessions)||{}).some(x=>x.status==='done'||x.notes||(x.rpe!=null&&x.rpe!=='')||(x.plan&&Object.values(x.plan).some(v=>Array.isArray(v)?v.some(r=>r.name):String(v||'').trim())));
@@ -378,7 +466,7 @@ try{ Object.assign(SY,JSON.parse(localStorage.getItem(SYNC_KEY)||'{}')); }catch(
 function syMeta(){ try{ localStorage.setItem(SYNC_KEY,JSON.stringify(SY)); }catch(e){} }
 function hhmm(){ const d=new Date(); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
 let syLast='';
-function syShow(m){ syLast=m; const st=document.getElementById('syncSt'); if(st) st.classList.toggle('link',!!SY.token); ['syncSt','syncState'].forEach(id=>{ const e=document.getElementById(id); if(e) e.textContent=(id==='syncSt'&&m?'同步：':'')+m; }); }
+function syShow(m){ syLast=m; const st=document.getElementById('syncSt'); if(st) st.classList.toggle('link',!!SY.token); ['syncSt','syncState'].forEach(id=>{ const e=document.getElementById(id); if(e) e.textContent=m; }); }
 const b64e=t=>btoa(unescape(encodeURIComponent(t)));
 const b64d=t=>decodeURIComponent(escape(atob(t.replace(/\s/g,''))));
 function ghData(method,body){
@@ -464,60 +552,97 @@ function sess(date){
 function peek(date){ return D.sessions[date]||{status:'planned'}; }
 const ST={planned:'未上課',done:'已完成',cancelled:'停課',tbc:'待確認'};
 
-let curTab='session', curDate=null;
+const IC={
+  up:'<svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg>',
+  down:'<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>',
+  x:'<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>'
+};
+const MORE=[
+  {k:'warmup',t:'專項教練熱身',c:'#E2873B',i:'<path d="M12 3c1 3 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-6 1-9z"/>'},
+  {k:'load',t:'訓練負荷',c:'#34a853',i:'<path d="M6 20v-8M12 20V5M18 20v-6"/>'},
+  {k:'refs',t:'訓練依據',c:'#5b7aa6',i:'<path d="M5 4h10a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h10"/>'},
+  {k:'settings',t:'設定與備份',c:'#8e8e93',i:'<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>'}
+];
+
+let curTab='session', curDate=null, curMore=null;
 function show(tab){
+  if(tab==='more'&&curTab==='more') curMore=null;
   curTab=tab;
-  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===tab));
-  document.querySelectorAll('main>section').forEach(s=>s.classList.toggle('hide',s.id!=='tab-'+tab));
+  document.querySelectorAll('.tb button').forEach(b=>b.classList.toggle('on',b.dataset.tab===tab));
+  document.querySelectorAll('main>section').forEach(s=>{
+    const on=s.id==='tab-'+tab; s.classList.toggle('hide',!on);
+    if(on){ s.classList.remove('pg'); void s.offsetWidth; s.classList.add('pg'); }
+  });
   render();
+  window.scrollTo(0,0);
 }
 $('nav').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b) show(b.dataset.tab); });
+$('nbBack').onclick=()=>{ curMore=null; render(); window.scrollTo(0,0); };
 
 function nextDate(){ const t=todayStr(); return allDates().find(d=>d>=t)||null; }
-
 function renderHeader(){
-  const s=D.settings;
-  $('hdrSub').textContent='每週二 '+s.time+(s.place?'｜'+s.place:'')+(s.sport?'｜'+s.sport:'');
-  const days=Math.ceil((parse(s.gameStart)-parse(todayStr()))/86400000);
-  $('hdrCd').innerHTML='距全中運'+(s.gameConfirmed?'':'（推估）')+'<br><b>'+(days>=0?days:0)+'</b> 天';
+  const inDetail=curTab==='more'&&!!curMore;
+  $('nbBack').classList.toggle('hide',!inDetail);
+  $('nbApp').classList.toggle('hide',inDetail);
+}
+
+function renderMore(){
+  const list=$('moreList'), det=$('moreDetail');
+  if(!curMore){
+    det.classList.add('hide'); list.classList.remove('hide');
+    list.innerHTML=`<div class="lt-row"><h1 class="lt">更多</h1></div>
+      <div class="grp">${MORE.map(m=>`<button class="row2 tap" data-more="${m.k}"><span class="ico" style="background:${m.c}"><svg viewBox="0 0 24 24">${m.i}</svg></span><span class="lbl">${m.t}</span><span class="chev">›</span></button>`).join('')}</div>
+      <div class="sec-f">版本 ${APP_VER}</div>`;
+    list.querySelectorAll('[data-more]').forEach(b=>b.onclick=()=>{ curMore=b.dataset.more; render(); window.scrollTo(0,0); });
+    return;
+  }
+  list.classList.add('hide'); det.classList.remove('hide');
+  const m=MORE.find(x=>x.k===curMore);
+  $('moreHead').innerHTML=`<div class="lt-row"><h1 class="lt">${m.t}</h1></div>`;
+  MORE.forEach(x=>$('tab-'+x.k).classList.toggle('hide',x.k!==curMore));
+  ({warmup:renderWarmup,load:renderLoad,refs:renderRefs,settings:renderSettings})[curMore]();
+  det.classList.remove('push'); void det.offsetWidth; det.classList.add('push');
 }
 
 function renderOverview(){
   const dates=allDates(), nx=nextDate();
-  if(!dates.length){ $('tab-overview').innerHTML='<div class="card"><p>沒有符合的上課日，請到「更多 → 設定與備份」檢查開始與最後一堂日期。</p></div>'; return; }
+  if(!dates.length){ $('tab-overview').innerHTML='<div class="lt-row"><h1 class="lt">時程</h1></div><div class="grp"><div class="row2">沒有符合的上課日，請到「更多 → 設定與備份」檢查開始與最後一堂日期。</div></div>'; return; }
   const live=dates.filter(d=>!['cancelled','tbc'].includes(peek(d).status));
   const done=dates.filter(d=>peek(d).status==='done').length;
   const s=D.settings;
+  const days=Math.max(0,Math.ceil((parse(s.gameStart)-parse(todayStr()))/86400000));
   const t0=parse(dates[0]), t1=parse(dates[dates.length-1]); const span=(t1-t0)||1;
   let bar='';
   D.phases.forEach(p=>{
     const a=Math.max(parse(p.start),t0), b=Math.min(parse(p.end),t1);
     const w=Math.max(((b-a)+7*86400000)/(span+7*86400000)*100,4);
-    bar+=`<div style="background:${p.color};width:${w}%" title="${esc(p.name)}">${esc(p.name)}</div>`;
+    bar+=`<div style="background:${p.color};width:${w}%" title="${esc(p.name)}">${w>=14?esc(p.name):''}</div>`;
   });
-  let rows='';
-  dates.forEach(d=>{
-    const ss=peek(d), ph=phaseOf(d);
-    const cls=(d===nx?'next ':'')+(d<todayStr()?'past ':'')+'click';
-    const st=ss.status||'planned';
-    rows+=`<tr class="${cls}" data-d="${d}">
-      <td>${md(d)}（二）${d===nx?'<span class="tag">下一堂</span>':''}</td>
-      <td>${ph?`<span style="color:${ph.color};font-weight:600">${esc(ph.name)}</span>`:'—'}</td>
-      <td><span class="pill st-${st}">${ST[st]}</span> <span class="muted">${esc(['cancelled','tbc'].includes(st)?ss.cancelReason||'':'')}</span></td></tr>`;
-  });
+  const rows=dates.map(d=>{
+    const ss=peek(d), ph=phaseOf(d), st=ss.status||'planned';
+    const reason=['cancelled','tbc'].includes(st)?(ss.cancelReason||''):'';
+    const cls=(d===nx?'next ':'')+(d<todayStr()?'past ':'');
+    return `<button class="row2 tap lrow ${cls}" data-d="${d}">
+      <div class="dcol"><b>${md(d)}</b><small>週二</small>${d===nx?'<span class="tagn">下一堂</span>':''}</div>
+      <div class="mid">${ph?`<span class="pn2"><span class="dot" style="background:${ph.color}"></span>${esc(ph.name)}</span>`:'—'}${reason?`<small>${esc(reason)}</small>`:''}</div>
+      <span class="pill st-${st}">${ST[st]}</span><span class="chev">›</span></button>`;
+  }).join('');
   $('tab-overview').innerHTML=`
-  <div class="card">
-    <p style="margin:0 0 10px">共 <b>${dates.length}</b> 堂，預計上課 <b>${live.length}</b>，已完成 <b>${done}</b>　｜　全中運${s.gameConfirmed?'':'（推估）'} <b>${md(s.gameStart)}–${md(s.gameEnd)}</b></p>
-    <div class="phasebar">${bar}</div>
-    <div class="muted">${D.phases.map(p=>`<span style="color:${p.color}">■</span> ${esc(p.name)} ${md(p.start)}–${md(p.end)}`).join('　')}</div>
-    ${s.gameConfirmed?'':'<p class="muted" style="margin-bottom:0">全中運日期官方尚未公布，目前是推估；公布後到「更多 → 設定與備份」修改。</p>'}
+  <div class="lt-row"><div><h1 class="lt">時程</h1><div class="lt-sub">共 ${dates.length} 堂 · 預計上課 ${live.length} · 已完成 ${done}</div></div></div>
+  <div class="grp">
+    <div class="row2"><span class="lbl">上課時間</span><span class="val">每週二 ${esc(s.time)}</span></div>
+    ${s.place?`<div class="row2"><span class="lbl">場地</span><span class="val">${esc(s.place)}</span></div>`:''}
+    <div class="row2"><span class="lbl">全中運${s.gameConfirmed?'':'（推估）'}</span><span class="val">${md(s.gameStart)}–${md(s.gameEnd)}</span></div>
+    <div class="row2"><span class="lbl">距離全中運</span><span class="val">${days} 天</span></div>
   </div>
-  <div class="card">
-    <h2>上課時程（點一列進入該堂）</h2>
-    <table><tr><th>日期</th><th>階段</th><th>狀態</th></tr>${rows}</table>
-  </div>`;
-  $('tab-overview').querySelectorAll('tr[data-d]').forEach(tr=>tr.onclick=()=>{ curDate=tr.dataset.d; show('session'); window.scrollTo(0,0); });
-  const nr=$('tab-overview').querySelector('tr.next'); if(nr) nr.scrollIntoView({block:'center'});
+  ${s.gameConfirmed?'':'<div class="sec-f">官方尚未公布日期，目前是推估；公布後到「更多 → 設定與備份」修改。</div>'}
+  <div class="sec-h">週期</div>
+  <div class="grp"><div class="row2 col"><div class="phasebar">${bar}</div>
+    <div class="legend">${D.phases.map(p=>`<div><span class="dot" style="background:${p.color}"></span> ${esc(p.name)}<span class="val">　${md(p.start)}–${md(p.end)}</span></div>`).join('')}</div></div></div>
+  <div class="sec-h">上課時程</div>
+  <div class="grp">${rows}</div>`;
+  $('tab-overview').querySelectorAll('[data-d]').forEach(tr=>tr.onclick=()=>{ curDate=tr.dataset.d; show('session'); });
+  const nr=$('tab-overview').querySelector('.next'); if(nr) nr.scrollIntoView({block:'center'});
 }
 
 function countRows(ss){
@@ -532,7 +657,7 @@ function exerciseNames(){
 
 function renderSession(){
   const dates=allDates();
-  if(!dates.length){ $('tab-session').innerHTML='<div class="card"><p>沒有符合的上課日，請到「更多 → 設定與備份」檢查開始與最後一堂日期。</p></div>'; return; }
+  if(!dates.length){ $('tab-session').innerHTML='<div class="lt-row"><h1 class="lt">本堂課</h1></div><div class="grp"><div class="row2">沒有符合的上課日，請到「更多 → 設定與備份」檢查開始與最後一堂日期。</div></div>'; return; }
   if(!curDate||!dates.includes(curDate)) curDate=nextDate()||dates[dates.length-1];
   const s=sess(curDate), ph=phaseOf(curDate), idx=dates.indexOf(curDate);
   const guide=ph?PHASE_GUIDE[ph.name]:null;
@@ -540,60 +665,56 @@ function renderSession(){
   const mark={done:'✓ ',cancelled:'✕ ',tbc:'？'};
   const srcs=dates.filter(d=>d!==curDate&&countRows(peek(d))>0);
   $('tab-session').innerHTML=`
-  <div class="card">
-    <div class="row">
-      <button class="b g" id="prevS" ${idx<=0?'disabled':''}>←</button>
-      <select id="pickS">${dates.map((d,i)=>`<option value="${d}" ${d===curDate?'selected':''}>${mark[peek(d).status]||''}第${i+1}堂 ${md(d)}</option>`).join('')}</select>
-      <button class="b g" id="nextS" ${idx>=dates.length-1?'disabled':''}>→</button>
-      <select id="sStatus">${Object.entries(ST).map(([k,v])=>`<option value="${k}" ${s.status===k?'selected':''}>${v}</option>`).join('')}</select>
-      <span style="margin-left:auto">${curDate===todayStr()?'<span class="tag">今天</span> ':''}${ph?`<b style="color:${ph.color}">${esc(ph.name)}</b>`:''}</span>
-    </div>
-    <input id="sReason" placeholder="停課／待確認原因" value="${esc(s.cancelReason||'')}" style="width:100%;margin-top:8px" class="${stopped?'':'hide'}">
+  <div class="lt-row">
+    <div><h1 class="lt">第 ${idx+1} 堂</h1>
+      <div class="lt-sub">${md(curDate)}（二）${ph?` · <span style="color:${ph.color};font-weight:600">${esc(ph.name)}</span>`:''}${curDate===todayStr()?' · <span class="tag">今天</span>':''}</div></div>
+    <div class="pn"><button class="ib2" id="prevS" ${idx<=0?'disabled':''} aria-label="上一堂">‹</button><button class="ib2" id="nextS" ${idx>=dates.length-1?'disabled':''} aria-label="下一堂">›</button></div>
   </div>
-  <div class="grid2" style="grid-template-columns:1.7fr 1fr">
-    <div class="card">
-      <h2>課程計畫</h2>
-      ${guide?`<details class="guide"><summary>本階段安排原則</summary><p class="muted">${esc(ph.goal)}</p><ul>${guide.rules.map(r=>`<li>${esc(r)}</li>`).join('')}</ul>
-        <details><summary class="muted">每堂共通原則</summary><ul>${COMMON_RULES.map(r=>`<li>${esc(r)}</li>`).join('')}</ul></details></details>`:''}
-      ${BLOCKS.map(b=>{ const hint=guide&&guide.blocks[b.k]; return `<div class="blk"><div class="t">${b.t}</div>${hint?`<div class="muted">${esc(hint)}</div>`:''}
-        ${s.plan[b.k].map((r,i,arr)=>`<div class="ex">
-          <div class="exh"><input class="exn" list="exList" data-p="${b.k}.${i}.name" value="${esc(r.name)}" placeholder="動作名稱" enterkeyhint="next">
-            <button class="b g mv" data-xmv="${b.k}.${i}.-1" ${i===0?'disabled':''} title="上移">▲</button><button class="b g mv" data-xmv="${b.k}.${i}.1" ${i===arr.length-1?'disabled':''} title="下移">▼</button></div>
-          <input class="exs" data-p="${b.k}.${i}.sets" value="${esc(r.sets)}" placeholder="組數" enterkeyhint="next">
-          <input class="exr" data-p="${b.k}.${i}.reps" value="${esc(r.reps)}" placeholder="次數" enterkeyhint="next">
-          <input class="exo" data-p="${b.k}.${i}.note" value="${esc(r.note)}" placeholder="備註" enterkeyhint="next">
-          <button class="b r" data-xdel="${b.k}.${i}" title="刪除">×</button></div>`).join('')}
-        <button class="b g" data-xadd="${b.k}">＋ 新增動作</button></div>`; }).join('')}
-      <datalist id="exList">${exerciseNames().map(n=>`<option value="${esc(n)}">`).join('')}</datalist>
-      ${srcs.length?`<select id="copyFrom"><option value="">複製計畫自…</option>${srcs.map(d=>`<option value="${d}">第${dates.indexOf(d)+1}堂 ${md(d)}（${countRows(peek(d))} 個動作）</option>`).join('')}</select>`:''}
-    </div>
-    <div>
-      <div class="card">
-        <h2>本堂強度</h2>
-        <div class="row">
-          <label class="muted">RPE（0–10，下課當下問大家的平均感受）<input type="number" id="sRpe" min="0" max="10" step="0.5" inputmode="decimal" value="${s.rpe??''}" style="width:72px"></label>
-          <label class="muted">分鐘 <input type="number" id="sMin" inputmode="numeric" value="${s.minutes??90}" style="width:72px"></label>
-        </div>
-        <p class="muted" id="attSum" style="margin-bottom:0"></p>
+  <div class="grp">
+    <div class="row2 pad"><div class="seg" id="segSt">${Object.entries(ST).map(([k,v])=>`<button data-st="${k}" class="${s.status===k?'on':''}">${v}</button>`).join('')}</div></div>
+    <div class="row2 ${stopped?'':'hide'}" id="reasonRow"><input id="sReason" placeholder="停課／待確認原因" value="${esc(s.cancelReason||'')}" style="width:100%"></div>
+    <div class="row2"><span class="lbl">跳到其他堂</span><select id="pickS">${dates.map((d,i)=>`<option value="${d}" ${d===curDate?'selected':''}>${mark[peek(d).status]||''}第${i+1}堂 ${md(d)}</option>`).join('')}</select></div>
+  </div>
+  ${guide?`<div class="sec-h">安排原則</div><details class="grp"><summary class="row2 tap"><span class="lbl">本階段：${esc(ph.name)}</span><span class="chev">›</span></summary>
+    <div class="gbody"><div class="muted">${esc(ph.goal)}</div><ul>${guide.rules.map(r=>`<li>${esc(r)}</li>`).join('')}</ul>
+    <details><summary class="muted">每堂共通原則</summary><ul>${COMMON_RULES.map(r=>`<li>${esc(r)}</li>`).join('')}</ul></details></div></details>`:''}
+  ${BLOCKS.map(b=>{ const hint=guide&&guide.blocks[b.k]; return `<div class="sec-h">${b.t}</div>
+  <div class="grp">${s.plan[b.k].map((r,i,arr)=>`<div class="ex2">
+      <div class="ex2-top">
+        <input class="exn" list="exList" data-p="${b.k}.${i}.name" value="${esc(r.name)}" placeholder="動作名稱" enterkeyhint="next">
+        <button class="ib" data-xmv="${b.k}.${i}.-1" ${i===0?'disabled':''} aria-label="上移">${IC.up}</button>
+        <button class="ib" data-xmv="${b.k}.${i}.1" ${i===arr.length-1?'disabled':''} aria-label="下移">${IC.down}</button>
+        <button class="ib del" data-xdel="${b.k}.${i}" aria-label="刪除">${IC.x}</button>
       </div>
-      <div class="card">
-        <h2>課後紀錄</h2>
-        <textarea id="sNotes" style="min-height:90px" placeholder="實際執行、觀察、下次調整、與專項教練溝通">${esc(s.notes||'')}</textarea>
-      </div>
-    </div>
-  </div>`;
+      <div class="ex2-bot">
+        <input class="exs" data-p="${b.k}.${i}.sets" value="${esc(r.sets)}" placeholder="組數" enterkeyhint="next">
+        <input class="exr" data-p="${b.k}.${i}.reps" value="${esc(r.reps)}" placeholder="次數" enterkeyhint="next">
+        <input class="exo" data-p="${b.k}.${i}.note" value="${esc(r.note)}" placeholder="備註" enterkeyhint="next">
+      </div></div>`).join('')}
+    <button class="addrow" data-xadd="${b.k}"><span class="plus">+</span>新增動作</button></div>${hint?`<div class="sec-f">${esc(hint)}</div>`:''}`; }).join('')}
+  <datalist id="exList">${exerciseNames().map(n=>`<option value="${esc(n)}">`).join('')}</datalist>
+  <div class="sec-h">本堂強度</div>
+  <div class="grp">
+    <div class="row2"><span class="lbl">RPE（0–10）</span><input class="num" type="number" id="sRpe" min="0" max="10" step="0.5" inputmode="decimal" value="${s.rpe??''}" placeholder="—"></div>
+    <div class="row2"><span class="lbl">分鐘</span><input class="num" type="number" id="sMin" inputmode="numeric" value="${s.minutes??90}"></div>
+  </div>
+  <div class="sec-f" id="attSum">下課當下問大家的平均感受（0 很輕鬆、10 極限）。</div>
+  <div class="sec-h">課後紀錄</div>
+  <div class="grp"><textarea id="sNotes" placeholder="實際執行、觀察、下次調整、與專項教練溝通">${esc(s.notes||'')}</textarea></div>
+  ${srcs.length?`<div class="sec-h">複製計畫</div><div class="grp"><div class="row2"><span class="lbl">複製計畫自</span><select id="copyFrom"><option value="">選擇…</option>${srcs.map(d=>`<option value="${d}">第${dates.indexOf(d)+1}堂 ${md(d)}（${countRows(peek(d))} 個動作）</option>`).join('')}</select></div></div>`:''}`;
   const T=$('tab-session');
-  $('pickS').onchange=e=>{ curDate=e.target.value; renderSession(); window.scrollTo(0,0); };
-  $('prevS').onclick=()=>{ curDate=dates[idx-1]; renderSession(); window.scrollTo(0,0); };
-  $('nextS').onclick=()=>{ curDate=dates[idx+1]; renderSession(); window.scrollTo(0,0); };
-  $('sStatus').onchange=e=>{ s.status=e.target.value; save(); renderSession(); };
+  const go=d=>{ curDate=d; renderSession(); window.scrollTo(0,0); };
+  $('pickS').onchange=e=>go(e.target.value);
+  $('prevS').onclick=()=>go(dates[idx-1]);
+  $('nextS').onclick=()=>go(dates[idx+1]);
+  T.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{ s.status=b.dataset.st; save(); renderSession(); });
   $('sReason').oninput=e=>{ s.cancelReason=e.target.value; save(); };
   $('sNotes').oninput=e=>{ s.notes=e.target.value; save(); };
   T.querySelectorAll('[data-p]').forEach(i=>{
     i.oninput=()=>{ const [k,n,f]=i.dataset.p.split('.'); s.plan[k][+n][f]=i.value; save(); };
     i.onkeydown=e=>{
       if(e.key!=='Enter') return; e.preventDefault();
-      const ins=[...i.closest('.ex').querySelectorAll('input')], at=ins.indexOf(i);
+      const ins=[...i.closest('.ex2').querySelectorAll('input')], at=ins.indexOf(i);
       if(at<ins.length-1){ ins[at+1].focus(); return; }
       const [k,n]=i.dataset.p.split('.');
       const nr=T.querySelector(`[data-p="${k}.${+n+1}.name"]`);
@@ -619,10 +740,10 @@ function renderSession(){
     if(countRows(s)>0&&!confirm('用 '+md(f)+' 的計畫覆蓋本堂已寫的內容？')){ e.target.value=''; return; }
     s.plan=JSON.parse(JSON.stringify(sess(f).plan)); save(); renderSession(); toast('已複製 '+md(f)+' 的計畫');
   };
-  const sumUp=()=>{ $('attSum').textContent=(s.rpe===''||s.rpe==null)?'':'sRPE（RPE × 分鐘）＝ '+Math.round(s.rpe*(s.minutes??90)); };
+  const sumUp=()=>{ $('attSum').textContent=(s.rpe===''||s.rpe==null)?'下課當下問大家的平均感受（0 很輕鬆、10 極限）。':'sRPE（RPE × 分鐘）＝ '+Math.round(s.rpe*(s.minutes??90)); };
   $('sRpe').oninput=e=>{
     s.rpe=e.target.value===''?'':+e.target.value;
-    if(s.rpe!==''&&s.status==='planned'){ s.status='done'; $('sStatus').value='done'; }
+    if(s.rpe!==''&&s.status==='planned'){ s.status='done'; T.querySelectorAll('[data-st]').forEach(b=>b.classList.toggle('on',b.dataset.st==='done')); }
     save(); sumUp();
   };
   $('sMin').oninput=e=>{ s.minutes=+e.target.value||0; save(); sumUp(); };
@@ -651,18 +772,17 @@ function renderLoad(){
 function renderSettings(){
   const s=D.settings;
   $('tab-settings').innerHTML=`
-  <div class="card"><h2>基本資料</h2>
-    <div class="grid2">
-      <div><label class="f">開始日期</label><input type="date" id="cStart" value="${s.start}"></div>
-      <div><label class="f">最後一堂</label><input type="date" id="cEnd" value="${s.end}"></div>
-      <div><label class="f">全中運開始</label><input type="date" id="cGs" value="${s.gameStart}"></div>
-      <div><label class="f">全中運結束</label><input type="date" id="cGe" value="${s.gameEnd}"></div>
-      <div><label class="f">承辦縣市</label><input id="cHost" value="${esc(s.gameHost)}"></div>
-      <div><label class="f">&nbsp;</label><label><input type="checkbox" id="cConf" ${s.gameConfirmed?'checked':''}> 日期已由官方確認</label></div>
-      <div><label class="f">上課時間</label><input id="cTime" value="${esc(s.time)}"></div>
-      <div><label class="f">場地</label><input id="cPlace" value="${esc(s.place)}"></div>
-      <div><label class="f">運動項目（隊伍）</label><input id="cSport" value="${esc(s.sport)}" placeholder="例如：田徑、籃球…"></div>
-    </div>
+  <div class="sec-h" style="margin-top:6px">基本資料</div>
+  <div class="grp">
+    <div class="row2"><span class="lbl">開始日期</span><input type="date" id="cStart" value="${s.start}"></div>
+    <div class="row2"><span class="lbl">最後一堂</span><input type="date" id="cEnd" value="${s.end}"></div>
+    <div class="row2"><span class="lbl">全中運開始</span><input type="date" id="cGs" value="${s.gameStart}"></div>
+    <div class="row2"><span class="lbl">全中運結束</span><input type="date" id="cGe" value="${s.gameEnd}"></div>
+    <div class="row2"><span class="lbl">全中運日期已確認</span><input type="checkbox" class="sw" id="cConf" ${s.gameConfirmed?'checked':''}></div>
+    <div class="row2"><span class="lbl">承辦縣市</span><input class="tx" id="cHost" value="${esc(s.gameHost)}"></div>
+    <div class="row2"><span class="lbl">上課時間</span><input class="tx" id="cTime" value="${esc(s.time)}"></div>
+    <div class="row2"><span class="lbl">場地</span><input class="tx" id="cPlace" value="${esc(s.place)}" placeholder="尚未填寫"></div>
+    <div class="row2"><span class="lbl">運動項目</span><input class="tx" id="cSport" value="${esc(s.sport)}" placeholder="例如：羽球"></div>
   </div>
   <div class="card"><h2>週期階段</h2>
     <table class="ptab"><tr><th>名稱</th><th>開始</th><th>結束</th><th>顏色</th><th>目標</th><th></th></tr>
@@ -792,11 +912,11 @@ function renderRefs(){
 
 function render(){
   renderHeader();
-  if(curTab==='more'){ renderWarmup(); renderLoad(); renderRefs(); renderSettings(); return; }
+  if(curTab==='more'){ renderMore(); return; }
   ({overview:renderOverview,session:renderSession})[curTab]();
 }
 load(); render();
-$('syncSt').onclick=()=>{ if(!SY.token) return; show('more'); const d=document.querySelectorAll('#tab-more details')[3]; d.open=true; d.scrollIntoView(); };
+$('syncSt').onclick=()=>{ if(!SY.token) return; curMore='settings'; if(curTab==='more'){ render(); } else { show('more'); } window.scrollTo(0,0); };
 if(SY.token){ syShow(SY.dirty?'待上傳…':''); syncNow(); }
 if('serviceWorker' in navigator && location.protocol==='https:'){
   const hadCtl=!!navigator.serviceWorker.controller; let reloaded=false;
